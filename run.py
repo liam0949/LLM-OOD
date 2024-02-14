@@ -5,7 +5,14 @@ import numpy as np
 import random
 from data import load
 from datasets import load_metric
-
+from peft import get_peft_model, LoraConfig, TaskType
+llama_peft_config = LoraConfig(
+    task_type=TaskType.SEQ_CLS, r=16, lora_alpha=16, lora_dropout=0.05, bias="none",
+    target_modules=[
+        "q_proj",
+        "v_proj",
+    ],
+)
 task_to_labels = {
     'sst2': 2,
     'imdb': 2,
@@ -85,7 +92,7 @@ class VImodel(PreTrainedModel):
 
 
 llama_checkpoint = "/home/bossjobai/LLM_Projects/llama/llama-2-7b-chat-hf"
-llm = LlamaForSequenceClassification.from_pretrained(
+model = LlamaForSequenceClassification.from_pretrained(
     pretrained_model_name_or_path=llama_checkpoint,
     num_labels=task_to_labels["sst2"],
     device_map="auto",
@@ -97,8 +104,10 @@ llama_tokenizer.pad_token_id = llama_tokenizer.eos_token_id
 llama_tokenizer.pad_token = llama_tokenizer.eos_token
 llm.config.pad_token_id = llm.config.eos_token_id
 # model = VImodel(llm).cuda()
-model  = llm.cuda()
 
+model = get_peft_model(model, llama_peft_config)
+model.print_trainable_parameters()
+model  = model.cuda()
 
 class ViCELossTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
