@@ -130,7 +130,7 @@ training_args = TrainingArguments(
     load_best_model_at_end=True,
     # report_to="wandb",
     fp16=True,
-    gradient_checkpointing=True,
+    # gradient_checkpointing=True,
 )
 
 
