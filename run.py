@@ -96,7 +96,7 @@ llm = LlamaForSequenceClassification.from_pretrained(
 llama_tokenizer = LlamaTokenizer.from_pretrained(llama_checkpoint, add_prefix_space=True)
 llama_tokenizer.pad_token_id = llama_tokenizer.eos_token_id
 llama_tokenizer.pad_token = llama_tokenizer.eos_token
-llm.config.pad_token_id = llama_model.config.eos_token_id
+llm.config.pad_token_id = llm.config.eos_token_id
 model = VImodel(llm).cuda()
 
 
