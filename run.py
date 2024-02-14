@@ -181,3 +181,28 @@ if __name__ == '__main__':
         # data_collator=llama_data_collator,
         compute_metrics=compute_metrics
     )
+
+    # llm.config.use_cache = False
+
+    # do_train = True
+
+    # Launch training and log metrics
+    print("Training...")
+    llama_trainer.train()
+    # if do_train:
+    #     train_result = trainer.train()
+    #     metrics = train_result.metrics
+    #     trainer.log_metrics("train", metrics)
+    #     trainer.save_metrics("train", metrics)
+    #     trainer.save_state()
+    #     print(metrics)
+    #
+    # # Save model
+    # print("Saving last checkpoint of the model...")
+    # os.makedirs(output_dir, exist_ok=True)
+    # trainer.model.save_pretrained(output_dir)
+    #
+    # # Free memory for merging weights
+    # del model
+    # del trainer
+    # torch.cuda.empty_cache()
