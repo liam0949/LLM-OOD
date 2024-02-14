@@ -128,7 +128,7 @@ training_args = TrainingArguments(
     evaluation_strategy="epoch",
     save_strategy="epoch",
     load_best_model_at_end=True,
-    report_to="wandb",
+    # report_to="wandb",
     fp16=True,
     gradient_checkpointing=True,
 )
