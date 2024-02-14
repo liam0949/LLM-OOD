@@ -31,6 +31,7 @@ task_to_metric = {
 
 class VImodel(torch.nn.Module):
     def __init__(self, llm, decoder=None):
+        super(VImodel, self).__init__()
         self.llm = llm
         self.decoder = decoder
 
