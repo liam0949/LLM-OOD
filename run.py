@@ -102,7 +102,7 @@ model  = llm.cuda()
 
 class ViCELossTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
-        labels = inputs.pop("label")
+        labels = inputs.pop("labels")
         # Get model's predictions
         outputs = model(**inputs)
         logits = outputs.get("logits")
