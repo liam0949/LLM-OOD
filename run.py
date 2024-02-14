@@ -89,8 +89,8 @@ llm = LlamaForSequenceClassification.from_pretrained(
     pretrained_model_name_or_path=llama_checkpoint,
     num_labels=task_to_labels["sst2"],
     device_map="auto",
-    # offload_folder="offload",
-    # trust_remote_code=True,
+    offload_folder="offload",
+    trust_remote_code=True,
     torch_dtype=torch.float16
 )
 llama_tokenizer = LlamaTokenizer.from_pretrained(llama_checkpoint, add_prefix_space=True)
@@ -175,7 +175,7 @@ if __name__ == '__main__':
             benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
             print("ood size " + dataset, len(ood_dataset))
     llama_data_collator = DataCollatorWithPadding(tokenizer=llama_tokenizer)
-   
+
     llama_trainer = ViCELossTrainer(
         model=model,
         args=training_args,
