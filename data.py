@@ -62,6 +62,10 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     # train_dataset = list(map(preprocess_function, datasets['train'])) if 'train' in datasets and is_id else None
     # dev_dataset = list(map(preprocess_function, datasets['validation'])) if 'validation' in datasets and is_id else None
     # test_dataset = list(map(preprocess_function, datasets['test'])) if 'test' in datasets else None
+    train_dataset.set_format("torch")
+    dev_dataset.set_format("torch")
+    test_dataset.set_format("torch")
+
     return train_dataset, dev_dataset, test_dataset
 
 
