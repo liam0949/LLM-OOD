@@ -123,7 +123,7 @@ class ViCELossTrainer(Trainer):
 
 lr = 1e-4
 batch_size = 64
-num_epochs = 5
+num_epochs = 1
 
 training_args = TrainingArguments(
     output_dir="./llama-lora-token-classification",
