@@ -97,7 +97,20 @@ llama_tokenizer = LlamaTokenizer.from_pretrained(llama_checkpoint, add_prefix_sp
 llama_tokenizer.pad_token_id = llama_tokenizer.eos_token_id
 llama_tokenizer.pad_token = llama_tokenizer.eos_token
 model = VImodel(llm).cuda()
-
+def collate_fn(batch):
+    max_len = max([len(f["input_ids"]) for f in batch])
+    input_ids = [f["input_ids"] + [0] * (max_len - len(f["input_ids"])) for f in batch]
+    input_mask = [[1.0] * len(f["input_ids"]) + [0.0] * (max_len - len(f["input_ids"])) for f in batch]
+    labels = [f["labels"] for f in batch]
+    input_ids = torch.tensor(input_ids, dtype=torch.long)
+    input_mask = torch.tensor(input_mask, dtype=torch.float)
+    labels = torch.tensor(labels, dtype=torch.long)
+    outputs = {
+        "input_ids": input_ids,
+        "attention_mask": input_mask,
+        "labels": labels,
+    }
+    return outputs
 
 class ViCELossTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
@@ -173,14 +186,17 @@ if __name__ == '__main__':
             _, _, ood_dataset = load(dataset, llama_tokenizer, max_seq_length=512)
             benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
             print("ood size " + dataset, len(ood_dataset))
-    llama_data_collator = DataCollatorWithPadding(tokenizer=llama_tokenizer)
+    # llama_data_collator = DataCollatorWithPadding(tokenizer=llama_tokenizer)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, collate_fn=collate_fn, shuffle=True,
+                                  drop_last=False)
+    dev_dataloader = DataLoader(dev_dataset, batch_size=batch_size, collate_fn=collate_fn)
     llama_trainer = ViCELossTrainer(
         model=model,
         args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=dev_dataset,
+        train_dataset=train_dataloader,
+        eval_dataset=train_dataloader,
         # test_dataset=test_dataset,
-        data_collator=llama_data_collator,
+        # data_collator=llama_data_collator,
         compute_metrics=compute_metrics
     )
 
