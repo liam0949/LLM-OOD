@@ -173,13 +173,14 @@ if __name__ == '__main__':
             _, _, ood_dataset = load(dataset, llama_tokenizer, max_seq_length=512)
             benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
             print("ood size " + dataset, len(ood_dataset))
+    llama_data_collator = DataCollatorWithPadding(tokenizer=llama_tokenizer)
     llama_trainer = ViCELossTrainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=dev_dataset,
         # test_dataset=test_dataset,
-        # data_collator=llama_data_collator,
+        data_collator=llama_data_collator,
         compute_metrics=compute_metrics
     )
 
