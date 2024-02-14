@@ -59,17 +59,17 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     # print(type(datasets['train']))
     train_dataset = datasets["train"].map(preprocess_function, batched=True,remove_columns = col_to_delete) if 'train' in datasets and is_id else None
     dev_dataset = datasets["validation"].map(preprocess_function, batched=True, remove_columns = col_to_delete) if 'validation' in datasets and is_id else None
-    test_dataset = datasets["test"].map(preprocess_function, batched=True, remove_columns= col_to_delete) if 'test' in datasets else None
+    # test_dataset = datasets["test"].map(preprocess_function, batched=True, remove_columns= col_to_delete) if 'test' in datasets else None
     import pandas as pd
 
-    train_dataset.to_pandas().info()
-    dev_dataset.to_pandas().info()
+    datasets["test"].to_pandas().info()
+    # dev_dataset.to_pandas().info()
     # train_dataset = list(map(preprocess_function, datasets['train'])) if 'train' in datasets and is_id else None
     # dev_dataset = list(map(preprocess_function, datasets['validation'])) if 'validation' in datasets and is_id else None
     # test_dataset = list(map(preprocess_function, datasets['test'])) if 'test' in datasets else None
     train_dataset.set_format("torch")
     dev_dataset.set_format("torch")
-    test_dataset.set_format("torch")
+    # test_dataset.set_format("torch")
 
     return train_dataset, dev_dataset, test_dataset
 
