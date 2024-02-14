@@ -96,7 +96,8 @@ llama_tokenizer = LlamaTokenizer.from_pretrained(llama_checkpoint, add_prefix_sp
 llama_tokenizer.pad_token_id = llama_tokenizer.eos_token_id
 llama_tokenizer.pad_token = llama_tokenizer.eos_token
 llm.config.pad_token_id = llm.config.eos_token_id
-model = VImodel(llm).cuda()
+# model = VImodel(llm).cuda()
+model  = llm.cuda()
 
 
 class ViCELossTrainer(Trainer):
