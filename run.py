@@ -157,8 +157,8 @@ def set_seed(args):
 
 
 if __name__ == '__main__':
-    datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
-    # datasets = ['rte', 'sst2']
+    # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
+    datasets = ['sst2']
     # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k', 'clinc150']
     # datasets = ['clinc150', 'bank', 'rostd']
     benchmarks = ()
