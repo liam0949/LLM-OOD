@@ -1,5 +1,5 @@
 from transformers import TrainingArguments, Trainer
-from transformers import LlamaForSequenceClassification, LlamaTokenizer,DataCollatorWithPadding
+from transformers import LlamaForSequenceClassification, LlamaTokenizer,DataCollatorWithPadding, PreTrainedModel
 import torch
 import numpy as np
 import random
@@ -29,7 +29,7 @@ task_to_metric = {
 }
 
 
-class VImodel(torch.nn.Module):
+class VImodel(PreTrainedModel):
     def __init__(self, llm, decoder=None):
         super(VImodel, self).__init__()
         self.llm = llm
@@ -90,8 +90,7 @@ llm = LlamaForSequenceClassification.from_pretrained(
     num_labels=task_to_labels["sst2"],
     device_map="auto",
     offload_folder="offload",
-    trust_remote_code=True,
-    torch_dtype=torch.float16
+    trust_remote_code=True
 )
 llama_tokenizer = LlamaTokenizer.from_pretrained(llama_checkpoint, add_prefix_space=True)
 llama_tokenizer.pad_token_id = llama_tokenizer.eos_token_id
