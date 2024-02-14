@@ -1,5 +1,5 @@
 import datasets
-from datasets import load_dataset
+from datasets import load_dataset, Dataset
 import random
 import numpy as np
 import csv
@@ -258,7 +258,7 @@ def load_sst2(shot, is_id):
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "sst2")
     #     dev_dataset = select_few_shot(shot, dev_dataset, "sst2")
-    datasets = {'train': train_dataset, 'validation': dev_dataset, 'test': test_dataset}
+    datasets = {'train': train_dataset, 'validation': dev_dataset, 'test': Dataset.from_list(test_dataset)}
     return datasets
 
 
