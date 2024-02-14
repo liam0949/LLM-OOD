@@ -122,7 +122,7 @@ class ViCELossTrainer(Trainer):
 
 
 lr = 1e-4
-batch_size = 128
+batch_size = 64
 num_epochs = 5
 
 training_args = TrainingArguments(
