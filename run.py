@@ -178,7 +178,7 @@ if __name__ == '__main__':
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=dev_dataset,
-        test_dataset=test_dataset,
+        # test_dataset=test_dataset,
         # data_collator=llama_data_collator,
         compute_metrics=compute_metrics
     )
