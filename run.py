@@ -1,5 +1,5 @@
 from transformers import TrainingArguments, Trainer
-from transformers import LlamaForSequenceClassification, LlamaTokenizer
+from transformers import LlamaForSequenceClassification, LlamaTokenizer,DataCollatorWithPadding
 import torch
 import numpy as np
 import random
