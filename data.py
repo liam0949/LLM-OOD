@@ -47,6 +47,7 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     elif task_name == 'bank':
         datasets = load_uood(is_id, shot=shot)
 
+    col_to_delete = ['idx', 'sentence']
     def preprocess_function(examples):
         inputs = (
             (examples[sentence1_key],) if sentence2_key is None else (
@@ -56,9 +57,9 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
         # result["labels"] = examples["label"] if 'label' in examples else 0
         return result
     # print(type(datasets['train']))
-    train_dataset = datasets["train"].map(preprocess_function, batched=True) if 'train' in datasets and is_id else None
-    dev_dataset = datasets["validation"].map(preprocess_function, batched=True) if 'validation' in datasets and is_id else None
-    test_dataset = datasets["test"].map(preprocess_function, batched=True) if 'test' in datasets else None
+    train_dataset = datasets["train"].map(preprocess_function, batched=True,col_to_delete = col_to_delete) if 'train' in datasets and is_id else None
+    dev_dataset = datasets["validation"].map(preprocess_function, batched=True, col_to_delete = col_to_delete) if 'validation' in datasets and is_id else None
+    test_dataset = datasets["test"].map(preprocess_function, batched=True, col_to_delete= col_to_delete) if 'test' in datasets else None
     import pandas as pd
 
     train_dataset.to_pandas().info()
