@@ -96,25 +96,13 @@ llm = LlamaForSequenceClassification.from_pretrained(
 llama_tokenizer = LlamaTokenizer.from_pretrained(llama_checkpoint, add_prefix_space=True)
 llama_tokenizer.pad_token_id = llama_tokenizer.eos_token_id
 llama_tokenizer.pad_token = llama_tokenizer.eos_token
+llm.config.pad_token_id = llama_model.config.eos_token_id
 model = VImodel(llm).cuda()
-def collate_fn(batch):
-    max_len = max([len(f["input_ids"]) for f in batch])
-    input_ids = [f["input_ids"] + [0] * (max_len - len(f["input_ids"])) for f in batch]
-    input_mask = [[1.0] * len(f["input_ids"]) + [0.0] * (max_len - len(f["input_ids"])) for f in batch]
-    labels = [f["labels"] for f in batch]
-    input_ids = torch.tensor(input_ids, dtype=torch.long)
-    input_mask = torch.tensor(input_mask, dtype=torch.float)
-    labels = torch.tensor(labels, dtype=torch.long)
-    outputs = {
-        "input_ids": input_ids,
-        "attention_mask": input_mask,
-        "labels": labels,
-    }
-    return outputs
+
 
 class ViCELossTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
-        labels = inputs.pop("labels")
+        labels = inputs.pop("label")
         # Get model's predictions
         outputs = model(**inputs)
         logits = outputs.get("logits")
@@ -187,9 +175,9 @@ if __name__ == '__main__':
             benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
             print("ood size " + dataset, len(ood_dataset))
     llama_data_collator = DataCollatorWithPadding(tokenizer=llama_tokenizer)
-    test_dataset.to_pandas().info()
-    dev_dataset.to_pandas().info()
-    train_dataset.to_pandas().info()
+    test_dataset.cuda()
+    train_dataset.cuda()
+    dev_dataset.cuda()
     llama_trainer = ViCELossTrainer(
         model=model,
         args=training_args,
