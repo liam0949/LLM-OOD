@@ -51,23 +51,23 @@ class ViCELossTrainer(Trainer):
         return (loss, outputs) if return_outputs else loss
 
 
-training_args = TrainingArguments(
-    output_dir="./llama-lora-token-classification",
-    learning_rate=lr,
-    lr_scheduler_type="constant",
-    warmup_ratio=0.1,
-    max_grad_norm=0.3,
-    per_device_train_batch_size=batch_size,
-    per_device_eval_batch_size=batch_size,
-    num_train_epochs=num_epochs,
-    weight_decay=0.001,
-    evaluation_strategy="epoch",
-    save_strategy="epoch",
-    load_best_model_at_end=True,
-    # report_to="wandb",
-    fp16=True,
-    # gradient_checkpointing=True,
-)
+# training_args = TrainingArguments(
+#     output_dir="./llama-lora-token-classification",
+#     learning_rate=lr,
+#     lr_scheduler_type="constant",
+#     warmup_ratio=0.1,
+#     max_grad_norm=0.3,
+#     per_device_train_batch_size=batch_size,
+#     per_device_eval_batch_size=batch_size,
+#     num_train_epochs=num_epochs,
+#     weight_decay=0.001,
+#     evaluation_strategy="epoch",
+#     save_strategy="epoch",
+#     load_best_model_at_end=True,
+#     # report_to="wandb",
+#     fp16=True,
+#     # gradient_checkpointing=True,
+# )
 
 
 def compute_metrics(eval_pred):
@@ -88,7 +88,7 @@ def set_seed(args):
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
-    if args.n_gpu > 0 and torch.cuda.is_available():
+    if torch.cuda.is_available():
         torch.cuda.manual_seed_all(args.seed)
 
 
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     training_args = TrainingArguments(
-        output_dir=os.path.join(args.save_results_path,args.task_name)
+        output_dir=os.path.join(args.save_results_path,args.task_name),
         learning_rate=args.learning_rate,
         lr_scheduler_type="constant",
         warmup_ratio=0.1,
