@@ -263,6 +263,8 @@ def load_sst2(shot, is_id):
 
     datasets = load_dataset('glue', 'sst2')
     train_dataset = datasets['train']
+    print(type(datasets['train']))
+    train_dataset.to_pandas().info()
     dev_dataset = datasets['validation']
     test_dataset = process('./data/sst2/test.data')
     # if is_id:
