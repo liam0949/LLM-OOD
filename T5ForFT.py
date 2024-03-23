@@ -151,11 +151,10 @@ if __name__ == '__main__':
     ##load model
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
     num_labels = task_to_labels[args.task_name]
-    config = AutoConfig.from_pretrained(args.model_name_or_path, num_labels=num_labels)
-    config.output_hidden_states = True
     model = AutoModelForSequenceClassification.from_pretrained(
-        args.model_name_or_path, config=config,
+        args.model_name_or_path, num_labels=num_labels
     )
+    model.config.output_hidden_states = True
 
     model.print_trainable_parameters()
     model = model.cuda()
