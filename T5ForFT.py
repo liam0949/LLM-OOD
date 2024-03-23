@@ -77,8 +77,9 @@ def compute_metrics(eval_pred):
     metric = load_metric("glue", metric_name, trust_remote_code=True)
 
     print(eval_pred)
-    logits, labels = eval_pred.get("logits"), eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
-
+    logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
+    print(type(logits))
+    print(logits)
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
     if len(result) > 1:
