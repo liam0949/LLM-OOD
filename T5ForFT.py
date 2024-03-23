@@ -12,6 +12,7 @@ from evaluation import evaluate_ood
 import wandb
 import warnings
 import os
+import datetime
 
 from data import load
 import random
@@ -145,10 +146,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     set_seed(args)
 
-    wandb.init(project=args.project_name)
+    wandb.init(project=args.project_name, name=args.task_name+str(datetime.datetime.now()))
     wan_config = wandb.config
     wan_config.learning_rate = args.learning_rate
-    wan_config.task_name = args.task_name
+    # wan_config.task_name = args.task_name
 
     ##load model
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
@@ -157,11 +158,13 @@ if __name__ == '__main__':
     #     args.model_name_or_path,
     #     num_labels=num_labels,
     #     revision="float16",
-    #     torch_dtype=torch.float16
+    #     torch_dtype=torch.float16,
+    # trust_remote_code = True
     # )
     model = AutoModelForSequenceClassification.from_pretrained(
         args.model_name_or_path,
-        num_labels=num_labels
+        num_labels=num_labels,
+    trust_remote_code = True
     )
     model.config.output_hidden_states = True
 
