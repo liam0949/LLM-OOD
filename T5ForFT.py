@@ -13,7 +13,7 @@ import wandb
 import warnings
 import os
 import datetime
-
+import evaluate
 from data import load
 import random
 from datasets import load_metric
@@ -74,13 +74,13 @@ class ViCELossTrainer(Trainer):
 
 def compute_metrics(eval_pred):
     metric_name = task_to_metric["sst2"]
-    metric = load_metric("glue", metric_name, trust_remote_code=True)
+    metric = evaluate.load("glue", metric_name)
 
 
     logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
     print(len(logits))
-    print(type(logits[0]))
-    print(type(logits[1]))
+    print(logits[0].shape)
+    print(len(logits[1]))
 
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
