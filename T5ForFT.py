@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, DataCollatorWithPadding,
+from transformers import AutoTokenizer, DataCollatorWithPadding
 import argparse
 import torch
 from tqdm import tqdm
@@ -159,6 +159,8 @@ if __name__ == '__main__':
 
     model.print_trainable_parameters()
     model = model.cuda()
+
+
 
     # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
     # datasets = ['sst2', 'imdb', 'trec', '20ng']
