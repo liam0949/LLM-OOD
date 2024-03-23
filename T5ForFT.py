@@ -152,11 +152,15 @@ if __name__ == '__main__':
     ##load model
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
     num_labels = task_to_labels[args.task_name]
+    # model = AutoModelForSequenceClassification.from_pretrained(
+    #     args.model_name_or_path,
+    #     num_labels=num_labels,
+    #     revision="float16",
+    #     torch_dtype=torch.float16
+    # )
     model = AutoModelForSequenceClassification.from_pretrained(
         args.model_name_or_path,
-        num_labels=num_labels,
-        revision="float16",
-        torch_dtype=torch.float16
+        num_labels=num_labels
     )
     model.config.output_hidden_states = True
 
