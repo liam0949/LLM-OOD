@@ -30,12 +30,16 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
         datasets = load_glue(task_name)
     elif task_name == 'sst2':
         datasets = load_sst2(shot, is_id)
+        col_to_delete = ['idx', 'sentence']
     elif task_name == '20ng':
         datasets = load_20ng(shot, is_id)
+        col_to_delete = ['idx', 'text']
     elif task_name == 'trec':
         datasets = load_trec(shot, is_id)
+        col_to_delete = ['idx', 'text']
     elif task_name == 'imdb':
         datasets = load_imdb(shot, is_id)
+        col_to_delete = ['idx', 'text']
     elif task_name == 'wmt16':
         datasets = load_wmt16()
     elif task_name == 'multi30k':
@@ -47,7 +51,7 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     elif task_name == 'bank':
         datasets = load_uood(is_id, shot=shot)
 
-    col_to_delete = ['idx', 'sentence']
+
     def preprocess_function(examples):
         inputs = (
             (examples[sentence1_key],) if sentence2_key is None else (

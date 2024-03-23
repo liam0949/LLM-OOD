@@ -86,7 +86,7 @@ llama_trainer = WeightedCELossTrainer(
 )
 
 
-import evaluate
+import evaluation
 import numpy as np
 def compute_metrics(eval_pred):
     # All metrics are already predefined in the HF `evaluate` package
