@@ -80,8 +80,8 @@ def compute_metrics(eval_pred):
 
 
     logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
-    print(len(logits))
-    print(logits.shape)
+    # print(len(logits))
+    # print(logits.shape)
     # print(labels.shape)
     # print(len(logits[1]))
     # print(logits[1][0].shape)
@@ -124,8 +124,8 @@ class ViCELossTrainer(Trainer):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    # parser.add_argument("--model_name_or_path", default="EleutherAI/gpt-j-6B", type=str,
-    parser.add_argument("--model_name_or_path", default="distilbert/distilbert-base-uncased", type=str,
+    parser.add_argument("--model_name_or_path", default="EleutherAI/gpt-j-6B", type=str,
+    # parser.add_argument("--model_name_or_path", default="distilbert/distilbert-base-uncased", type=str,
                         help="roberta-large;bert-base-uncased")
     parser.add_argument("--max_seq_length", default=512, type=int)
     parser.add_argument("--task_name", default="sst2", type=str)
@@ -166,18 +166,18 @@ if __name__ == '__main__':
     ##load model
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
     num_labels = task_to_labels[args.task_name]
-    # model = AutoModelForSequenceClassification.from_pretrained(
-    #     args.model_name_or_path,
-    #     num_labels=num_labels,
-    #     revision="float16",
-    #     torch_dtype=torch.float16,
-    # trust_remote_code = True
-    # )
     model = AutoModelForSequenceClassification.from_pretrained(
         args.model_name_or_path,
         num_labels=num_labels,
+        revision="float16",
+        torch_dtype=torch.float16,
         trust_remote_code = True
     )
+    # model = AutoModelForSequenceClassification.from_pretrained(
+    #     args.model_name_or_path,
+    #     num_labels=num_labels,
+    #     trust_remote_code = True
+    # )
     model.config.output_hidden_states = True
     model.config.keys_to_ignore_at_inference = ["hidden_states"]
 
