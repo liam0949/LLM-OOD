@@ -29,6 +29,7 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     if task_name in ('mnli', 'rte'):
         datasets = load_glue(task_name)
     elif task_name == 'sst2':
+        print("in sst2")
         datasets = load_sst2(shot, is_id)
         col_to_delete = ['idx', 'sentence']
     elif task_name == '20ng':
