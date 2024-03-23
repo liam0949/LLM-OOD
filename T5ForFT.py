@@ -84,9 +84,9 @@ def compute_metrics(eval_pred):
     # print(logits[0].shape)
     # print(labels.shape)
     print(len(logits[1]))
-    print(type(logits[1][0]))
-    print(type(logits[1][1]))
-    print(logits[1].shape)
+    print(logits[1][0].shape)
+    print(logits[1][1].shape)
+    # print(logits[1].shape)
     # print(len(logits[1]))
     logits = logits[0]
 
