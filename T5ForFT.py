@@ -110,7 +110,7 @@ class ViCELossTrainer(Trainer):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_name_or_path", default="google-t5/t5-large", type=str,
+    parser.add_argument("--model_name_or_path", default="EleutherAI/gpt-j-6B", type=str,
                         help="roberta-large;bert-base-uncased")
     parser.add_argument("--max_seq_length", default=512, type=int)
     parser.add_argument("--task_name", default="sst2", type=str)
@@ -152,7 +152,10 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
     num_labels = task_to_labels[args.task_name]
     model = AutoModelForSequenceClassification.from_pretrained(
-        args.model_name_or_path, num_labels=num_labels
+        args.model_name_or_path,
+        num_labels=num_labels,
+        revision="float16",
+        torch_dtype=torch.float16
     )
     model.config.output_hidden_states = True
 
