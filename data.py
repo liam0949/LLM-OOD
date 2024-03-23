@@ -61,7 +61,8 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
         result = tokenizer(*inputs, max_length=max_seq_length, truncation=True)
         # result["labels"] = examples["label"] if 'label' in examples else 0
         return result
-    # print(type(datasets['train']))
+    print(type(datasets['train']))
+    train_dataset.to_pandas().info()
     train_dataset = datasets["train"].map(preprocess_function, batched=True,remove_columns = col_to_delete) if 'train' in datasets and is_id else None
     dev_dataset = datasets["validation"].map(preprocess_function, batched=True, remove_columns = col_to_delete) if 'validation' in datasets and is_id else None
     test_dataset = datasets["test"].map(preprocess_function, batched=True, remove_columns="sentence") if 'test' in datasets else None
