@@ -159,7 +159,7 @@ if __name__ == '__main__':
     )
     model.config.output_hidden_states = True
 
-    model.print_trainable_parameters()
+    # model.print_trainable_parameters()
     model = model.cuda()
 
 
