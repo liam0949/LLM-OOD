@@ -76,7 +76,8 @@ def compute_metrics(eval_pred):
     metric_name = task_to_metric["sst2"]
     metric = load_metric("glue", metric_name, trust_remote_code=True)
 
-    logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
+    print(eval_pred)
+    logits, labels = eval_pred.get("logits"), eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
 
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
@@ -166,7 +167,7 @@ if __name__ == '__main__':
         num_labels=num_labels,
         trust_remote_code = True
     )
-    # model.config.output_hidden_states = True
+    model.config.output_hidden_states = True
 
     # model.print_trainable_parameters()
     model = model.cuda()
