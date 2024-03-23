@@ -77,7 +77,9 @@ def compute_metrics(eval_pred):
     metric = load_metric("glue", metric_name, trust_remote_code=True)
 
     logits, labels = eval_pred  # eval_pred is the tuple of predictions and labels returned by the model
-
+    print("in metrics")
+    print(logits.size())
+    print(labels.size())
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
     if len(result) > 1:
@@ -164,7 +166,7 @@ if __name__ == '__main__':
     model = AutoModelForSequenceClassification.from_pretrained(
         args.model_name_or_path,
         num_labels=num_labels,
-    trust_remote_code = True
+        trust_remote_code = True
     )
     model.config.output_hidden_states = True
 
