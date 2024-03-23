@@ -86,7 +86,7 @@ def compute_metrics(eval_pred):
     print(len(logits[1]))
     print(logits[1][0].shape)
     print(logits[1][1].shape)
-    # print(logits[1].shape)
+    print(logits[1].shape)
     # print(len(logits[1]))
     logits = logits[0]
 
