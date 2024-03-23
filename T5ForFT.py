@@ -110,7 +110,8 @@ class ViCELossTrainer(Trainer):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_name_or_path", default="EleutherAI/gpt-j-6B", type=str,
+    # parser.add_argument("--model_name_or_path", default="EleutherAI/gpt-j-6B", type=str,
+    parser.add_argument("--model_name_or_path", default="distilbert/distilbert-base-uncased", type=str,
                         help="roberta-large;bert-base-uncased")
     parser.add_argument("--max_seq_length", default=512, type=int)
     parser.add_argument("--task_name", default="sst2", type=str)
