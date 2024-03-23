@@ -11,6 +11,7 @@ from datasets import load_metric
 from evaluation import evaluate_ood
 import wandb
 import warnings
+import os
 
 from data import load
 import random
