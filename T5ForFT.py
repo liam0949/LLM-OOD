@@ -179,7 +179,7 @@ if __name__ == '__main__':
         trust_remote_code = True
     )
     model.config.output_hidden_states = True
-    model.config.keys_to_ignore_at_inference = "hidden_states"
+    model.config.keys_to_ignore_at_inference = ["hidden_states"]
 
     # model.print_trainable_parameters()
     model = model.cuda()
