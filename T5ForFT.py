@@ -80,15 +80,15 @@ def compute_metrics(eval_pred):
 
 
     logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
-    # print(len(logits))
-    # print(logits[0].shape)
+    print(len(logits))
+    print(logits.shape)
     # print(labels.shape)
-    print(len(logits[1]))
-    print(logits[1][0].shape)
-    print(logits[1][1].shape)
-    print(logits[1].shape)
     # print(len(logits[1]))
-    logits = logits[0]
+    # print(logits[1][0].shape)
+    # print(logits[1][1].shape)
+    # print(logits[1].shape)
+    # # print(len(logits[1]))
+    # logits = logits[0]
 
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
@@ -132,12 +132,12 @@ if __name__ == '__main__':
 
     parser.add_argument("--batch_size", default=256, type=int)
     parser.add_argument("--val_batch_size", default=128, type=int)
-    parser.add_argument("--learning_rate", default=2e-4, type=float)
+    parser.add_argument("--learning_rate", default=5e-5, type=float)
     parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
     parser.add_argument("--adam_epsilon", default=1e-8, type=float)
     parser.add_argument("--warmup_ratio", default=0.06, type=float)
     parser.add_argument("--weight_decay", default=0.01, type=float)
-    parser.add_argument("--num_train_epochs", default=10, type=float)
+    parser.add_argument("--num_train_epochs", default=2, type=float)
     parser.add_argument("--seed", type=int, default=88)
     parser.add_argument("--project_name", type=str, default="coling2024_ood")
     parser.add_argument("--shot", type=int, default=100)
@@ -179,6 +179,7 @@ if __name__ == '__main__':
         trust_remote_code = True
     )
     model.config.output_hidden_states = True
+    model.config.keys_to_ignore_at_inference = "hidden_states"
 
     # model.print_trainable_parameters()
     model = model.cuda()
