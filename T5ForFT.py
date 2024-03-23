@@ -127,7 +127,7 @@ if __name__ == '__main__':
     parser.add_argument("--project_name", type=str, default="coling2024_ood")
     parser.add_argument("--shot", type=int, default=100)
     parser.add_argument("--freeze", action='store_true', help="freeze the model")
-    parser.add_argument("--save_results_path", type=str, default='/data2/liming/few-shot-nlp',
+    parser.add_argument("--save_results_path", type=str, default='/data2/liming/LLM-OOD',
                         help="the path to save results")
 
     parser.add_argument("--ib", action="store_true", help="If specified, uses the information bottleneck to reduce\
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     training_args = TrainingArguments(
-        output_dir=args.save_results_path,
+        output_dir=os.path.join(args.save_results_path,args.task_name)
         learning_rate=args.learning_rate,
         lr_scheduler_type="constant",
         warmup_ratio=0.1,
