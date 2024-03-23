@@ -80,7 +80,9 @@ def compute_metrics(eval_pred):
     logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
     print(len(logits))
     print(logits[0].shape)
-    print(len(logits[1]))
+    print(labels.shape)
+    # print(len(logits[1]))
+    logits = logits[0]
 
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
