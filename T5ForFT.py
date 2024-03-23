@@ -166,7 +166,7 @@ if __name__ == '__main__':
         num_labels=num_labels,
         trust_remote_code = True
     )
-    model.config.output_hidden_states = True
+    # model.config.output_hidden_states = True
 
     # model.print_trainable_parameters()
     model = model.cuda()
