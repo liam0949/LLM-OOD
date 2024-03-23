@@ -17,6 +17,8 @@ import evaluate
 from data import load
 import random
 from datasets import load_metric
+import warnings
+warnings.filterwarnings("ignore")
 
 task_to_labels = {
     'sst2': 2,
@@ -78,9 +80,13 @@ def compute_metrics(eval_pred):
 
 
     logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
-    print(len(logits))
-    print(logits[0].shape)
-    print(labels.shape)
+    # print(len(logits))
+    # print(logits[0].shape)
+    # print(labels.shape)
+    print(len(logits[1]))
+    print(type(logits[1][0]))
+    print(type(logits[1][1]))
+    print(logits[1].shape)
     # print(len(logits[1]))
     logits = logits[0]
 
