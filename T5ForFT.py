@@ -76,11 +76,8 @@ def compute_metrics(eval_pred):
     metric_name = task_to_metric["sst2"]
     metric = load_metric("glue", metric_name, trust_remote_code=True)
 
-    logits, labels = eval_pred  # eval_pred is the tuple of predictions and labels returned by the model
-    print("in metrics")
-    # print(logits[0].size())
-    print(logits[1].size())
-    print(labels.size())
+    logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
+
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
     if len(result) > 1:
