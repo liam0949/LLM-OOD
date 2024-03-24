@@ -272,7 +272,7 @@ if __name__ == '__main__':
 
     print("Testing...")
     test_acc = llama_trainer.evaluate(test_dataset)
-    wandb.log({"test_acc", test_acc["accuracy"]})
+    wandb.log({"test_acc": test_acc})
     # if do_train:
     #     train_result = trainer.train()
     #     metrics = train_result.metrics
