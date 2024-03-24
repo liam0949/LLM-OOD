@@ -228,7 +228,7 @@ if __name__ == '__main__':
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     training_args = TrainingArguments(
-        output_dir=os.path.join(args.save_results_path, args.task_name, args.seed),
+        output_dir=os.path.join(args.save_results_path, args.task_name, str(args.seed)),
         learning_rate=args.learning_rate,
         lr_scheduler_type="constant",
         warmup_ratio=0.1,
