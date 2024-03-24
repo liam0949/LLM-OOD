@@ -18,6 +18,7 @@ from data import load
 import random
 from datasets import load_metric
 import warnings
+warnings.filterwarnings("ignore")
 from peft import get_peft_model, LoraConfig, TaskType
 peft_config = LoraConfig(
     task_type=TaskType.SEQ_CLS, r=8, lora_alpha=16, lora_dropout=0.05, bias="none",
@@ -26,8 +27,9 @@ peft_config = LoraConfig(
         "v_proj",
     ],
 )
-warnings.filterwarnings("ignore")
 
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cudnn.allow_tf32 = True
 task_to_labels = {
     'sst2': 2,
     'imdb': 2,
