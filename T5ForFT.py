@@ -204,8 +204,8 @@ if __name__ == '__main__':
     #     num_labels=num_labels,
     #     trust_remote_code = True
     # )
-    model.config.output_hidden_states = True
-    model.config.keys_to_ignore_at_inference = ["hidden_states"]
+    # model.config.output_hidden_states = True
+    # model.config.keys_to_ignore_at_inference = ["hidden_states"]
 
     # model.print_trainable_parameters()
     # model = prepare_model_for_int8_training(model)
