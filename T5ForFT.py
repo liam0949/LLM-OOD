@@ -194,7 +194,7 @@ if __name__ == '__main__':
     model.config.keys_to_ignore_at_inference = ["hidden_states"]
 
     # model.print_trainable_parameters()
-    model = prepare_model_for_int8_training(model)
+    # model = prepare_model_for_int8_training(model)
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
     model = model.cuda()
@@ -226,7 +226,7 @@ if __name__ == '__main__':
         save_strategy="epoch",
         load_best_model_at_end=True,
         report_to="wandb",
-        fp16=True
+        bf16=True
         # gradient_checkpointing=True,
     )
 
