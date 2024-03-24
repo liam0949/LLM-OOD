@@ -5,6 +5,7 @@ from tqdm import tqdm
 import numpy as np
 from torch.utils.data import DataLoader
 from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer, AutoTokenizer, AutoConfig
+from transformers import  BitsAndBytesConfig
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from utils import set_seed, collate_fn, AverageMeter, accuracy
 from datasets import load_metric
@@ -21,7 +22,7 @@ import warnings
 warnings.filterwarnings("ignore")
 from peft import get_peft_model, LoraConfig, TaskType
 peft_config = LoraConfig(
-    task_type=TaskType.SEQ_CLS, r=8, lora_alpha=16, lora_dropout=0.05, bias="none",
+    task_type=TaskType.SEQ_CLS, r=16, lora_alpha=32, lora_dropout=0.05, bias="none",
     target_modules=[
         "q_proj",
         "v_proj",
@@ -134,7 +135,7 @@ class ViCELossTrainer(Trainer):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_name_or_path", default="EleutherAI/gpt-j-6B", type=str,
+    parser.add_argument("--model_name_or_path", default="/home/liming/projects/llama/hf_models/llama-2-7b-hf", type=str,
     # parser.add_argument("--model_name_or_path", default="distilbert/distilbert-base-uncased", type=str,
                         help="roberta-large;bert-base-uncased")
     parser.add_argument("--max_seq_length", default=512, type=int)
@@ -174,7 +175,7 @@ if __name__ == '__main__':
     # wan_config.task_name = args.task_name
 
     ##load model
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path, add_prefix_space=True)
     num_labels = task_to_labels[args.task_name]
     tokenizer.pad_token_id = tokenizer.eos_token_id
     tokenizer.pad_token = tokenizer.eos_token
@@ -183,8 +184,18 @@ if __name__ == '__main__':
         args.model_name_or_path,
         num_labels=num_labels,
         device_map="auto",
+        offload_folder="offload",
         load_in_8bit=True,
-        trust_remote_code = True
+        quantization_config=BitsAndBytesConfig(
+            # load_in_4bit=model_args.bits == 4,
+            load_in_8bit=True,
+            llm_int8_threshold=6.0,
+            llm_int8_has_fp16_weight=False
+            # bnb_4bit_compute_dtype=compute_dtype,
+            # bnb_4bit_use_double_quant=model_args.double_quant,
+            # bnb_4bit_quant_type=model_args.quant_type,
+        ),
+        trust_remote_code=True,
     )
     model.config.pad_token_id = model.config.eos_token_id
     # model = AutoModelForSequenceClassification.from_pretrained(
