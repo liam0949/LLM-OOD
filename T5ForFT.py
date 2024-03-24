@@ -141,9 +141,9 @@ if __name__ == '__main__':
     parser.add_argument("--max_seq_length", default=512, type=int)
     parser.add_argument("--task_name", default="sst2", type=str)
 
-    parser.add_argument("--batch_size", default=8, type=int)
-    parser.add_argument("--val_batch_size", default=32, type=int)
-    parser.add_argument("--learning_rate", default=5e-5, type=float)
+    parser.add_argument("--batch_size", default=32, type=int)
+    parser.add_argument("--val_batch_size", default=128, type=int)
+    parser.add_argument("--learning_rate", default=1e-e, type=float)
     parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
     parser.add_argument("--adam_epsilon", default=1e-8, type=float)
     parser.add_argument("--warmup_ratio", default=0.06, type=float)
