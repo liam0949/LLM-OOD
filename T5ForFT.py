@@ -92,15 +92,15 @@ def compute_metrics(eval_pred):
 
     logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
     # logits, labels = eval_pred  # eval_pred is the tuple of predictions and labels returned by the model
-    print(len(logits))
-    print(logits.shape)
+    # print(len(logits))
+    # print(logits.shape)
     # print(labels.shape)
     # print(len(logits[1]))
     # print(logits[1][0].shape)
     # print(logits[1][1].shape)
     # print(logits[1].shape)
     # # print(len(logits[1]))
-    # logits = logits[0]
+    logits = logits[0]
 
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
@@ -204,8 +204,8 @@ if __name__ == '__main__':
     #     num_labels=num_labels,
     #     trust_remote_code = True
     # )
-    # model.config.output_hidden_states = True
-    # model.config.keys_to_ignore_at_inference = ["hidden_states"]
+    model.config.output_hidden_states = True
+    model.config.keys_to_ignore_at_inference = ["hidden_states"]
 
     # model.print_trainable_parameters()
     # model = prepare_model_for_int8_training(model)
@@ -234,6 +234,7 @@ if __name__ == '__main__':
         max_grad_norm=0.3,
         per_device_train_batch_size=args.batch_size,
         per_device_eval_batch_size=args.val_batch_size,
+        dataloader_drop_last = True,
         num_train_epochs=args.num_train_epochs,
         # gradient_accumulation_steps=4,
         weight_decay=0.001,
