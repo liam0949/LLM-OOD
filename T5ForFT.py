@@ -143,7 +143,7 @@ if __name__ == '__main__':
     parser.add_argument("--task_name", default="sst2", type=str)
 
     parser.add_argument("--batch_size", default=64, type=int)
-    parser.add_argument("--val_batch_size", default=128, type=int)
+    parser.add_argument("--val_batch_size", default=64, type=int)
     parser.add_argument("--learning_rate", default=1e-4, type=float)
     parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
     parser.add_argument("--adam_epsilon", default=1e-8, type=float)
@@ -235,7 +235,7 @@ if __name__ == '__main__':
         per_device_train_batch_size=args.batch_size,
         per_device_eval_batch_size=args.val_batch_size,
         num_train_epochs=args.num_train_epochs,
-        gradient_accumulation_steps=4,
+        # gradient_accumulation_steps=4,
         weight_decay=0.001,
         evaluation_strategy="steps",
         eval_steps=100,
