@@ -153,7 +153,7 @@ if __name__ == '__main__':
     parser.add_argument("--project_name", type=str, default="coling2024_ood")
     parser.add_argument("--shot", type=int, default=100)
     parser.add_argument("--freeze", action='store_true', help="freeze the model")
-    parser.add_argument("--save_results_path", type=str, default='/data2/liming/LLM-OOD',
+    parser.add_argument("--save_results_path", type=str, default='/home/liming/model_cps/LLM-OOD',
                         help="the path to save results")
 
     parser.add_argument("--ib", action="store_true", help="If specified, uses the information bottleneck to reduce\
@@ -185,7 +185,7 @@ if __name__ == '__main__':
         num_labels=num_labels,
         device_map="auto",
         offload_folder="offload",
-        load_in_8bit=True,
+        # load_in_8bit=True,
         quantization_config=BitsAndBytesConfig(
             # load_in_4bit=model_args.bits == 4,
             load_in_8bit=True,
