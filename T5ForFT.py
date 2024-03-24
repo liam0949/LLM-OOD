@@ -20,7 +20,7 @@ from datasets import load_metric
 import warnings
 from peft import get_peft_model, LoraConfig, TaskType
 peft_config = LoraConfig(
-    task_type=TaskType.SEQ_CLS, r=16, lora_alpha=16, lora_dropout=0.05, bias="none",
+    task_type=TaskType.SEQ_CLS, r=16, lora_alpha=32, lora_dropout=0.05, bias="none",
     target_modules=[
         "q_proj",
         "v_proj",
@@ -138,13 +138,13 @@ if __name__ == '__main__':
     parser.add_argument("--max_seq_length", default=512, type=int)
     parser.add_argument("--task_name", default="sst2", type=str)
 
-    parser.add_argument("--batch_size", default=8, type=int)
-    parser.add_argument("--val_batch_size", default=8, type=int)
+    parser.add_argument("--batch_size", default=128, type=int)
+    parser.add_argument("--val_batch_size", default=128, type=int)
     parser.add_argument("--learning_rate", default=5e-5, type=float)
     parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
     parser.add_argument("--adam_epsilon", default=1e-8, type=float)
     parser.add_argument("--warmup_ratio", default=0.06, type=float)
-    parser.add_argument("--weight_decay", default=0.01, type=float)
+    parser.add_argument("--weight_decay", default=0.001, type=float)
     parser.add_argument("--num_train_epochs", default=2, type=float)
     parser.add_argument("--seed", type=int, default=88)
     parser.add_argument("--project_name", type=str, default="coling2024_ood")
@@ -220,11 +220,12 @@ if __name__ == '__main__':
         per_device_train_batch_size=args.batch_size,
         per_device_eval_batch_size=args.val_batch_size,
         num_train_epochs=args.num_train_epochs,
-        weight_decay=0.01,
+        weight_decay=0.001,
         evaluation_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
         report_to="wandb",
+        fp16=True
         # gradient_checkpointing=True,
     )
 
