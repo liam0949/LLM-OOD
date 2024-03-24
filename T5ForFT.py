@@ -94,8 +94,8 @@ def compute_metrics(eval_pred):
 
     logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
     # logits, labels = eval_pred  # eval_pred is the tuple of predictions and labels returned by the model
-    # print(len(logits))
-    # print(logits.shape)
+    print(len(logits))
+    print(logits.shape)
     # print(labels.shape)
     # print(len(logits[1]))
     # print(logits[1][0].shape)
