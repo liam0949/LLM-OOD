@@ -25,7 +25,7 @@ warnings.filterwarnings("ignore")
 from peft import get_peft_model, LoraConfig, TaskType
 
 peft_config = LoraConfig(
-    task_type=TaskType.SEQ_CLS, r=8, lora_alpha=16, lora_dropout=0.05, bias="none",
+    task_type=TaskType.SEQ_CLS, r=16, lora_alpha=32, lora_dropout=0.05, bias="none",
     target_modules=[
         "q_proj",
         "v_proj",
