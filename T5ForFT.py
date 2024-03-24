@@ -146,12 +146,12 @@ if __name__ == '__main__':
 
     parser.add_argument("--batch_size", default=64, type=int)
     parser.add_argument("--val_batch_size", default=128, type=int)
-    parser.add_argument("--learning_rate", default=5e-5, type=float)
+    parser.add_argument("--learning_rate", default=1e-4, type=float)
     parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
     parser.add_argument("--adam_epsilon", default=1e-8, type=float)
     parser.add_argument("--warmup_ratio", default=0.06, type=float)
     parser.add_argument("--weight_decay", default=0.001, type=float)
-    parser.add_argument("--num_train_epochs", default=2, type=float)
+    parser.add_argument("--num_train_epochs", default=3, type=float)
     parser.add_argument("--seed", type=int, default=88)
     parser.add_argument("--project_name", type=str, default="coling2024_ood")
     parser.add_argument("--shot", type=int, default=100)
@@ -240,10 +240,10 @@ if __name__ == '__main__':
         eval_accumulation_steps=2,
         weight_decay=0.001,
         evaluation_strategy="steps",
-        eval_steps=300,
-        logging_steps=300,
+        eval_steps=500,
+        logging_steps=500,
         save_strategy = "steps",
-        save_steps=300,
+        save_steps=500,
         load_best_model_at_end=True,
         save_total_limit=2,
         report_to="wandb",
