@@ -90,8 +90,8 @@ def compute_metrics(eval_pred):
     metric = evaluate.load("glue", metric_name)
 
 
-    # logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
-    logits, labels = eval_pred  # eval_pred is the tuple of predictions and labels returned by the model
+    logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
+    # logits, labels = eval_pred  # eval_pred is the tuple of predictions and labels returned by the model
     print(len(logits))
     print(logits.shape)
     # print(labels.shape)
@@ -204,7 +204,7 @@ if __name__ == '__main__':
     #     num_labels=num_labels,
     #     trust_remote_code = True
     # )
-    # model.config.output_hidden_states = True
+    model.config.output_hidden_states = True
     model.config.keys_to_ignore_at_inference = ["hidden_states"]
 
     # model.print_trainable_parameters()
