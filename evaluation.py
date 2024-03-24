@@ -14,30 +14,32 @@ def merge_keys(l, keys):
     return new_dict
 
 
-def evaluate_ood(args, model, features, ood, tag):
-    if args.ib:
-        keys = ['softmax', 'maha', 'cosine', 'energy']
-    else:
-        keys = ['softmax', 'maha', 'cosine', 'energy']
 
-    dataloader = DataLoader(features, batch_size=args.val_batch_size, collate_fn=collate_fn)
-    in_scores = []
-    for batch in dataloader:
-        model.eval()
-        batch = {key: value.to(args.device) for key, value in batch.items()}
-        with torch.no_grad():
-            ood_keys = model.compute_ood(**batch)
-            in_scores.append(ood_keys)
+
+
+def evaluate_ood( in_scores,out_scores):
+
+    keys = ['softmax', 'maha', 'cosine', 'energy']
+
+
+    # dataloader = DataLoader(features, batch_size=args.val_batch_size, collate_fn=collate_fn)
+    # in_scores = []
+    # for batch in dataloader:
+    #     model.eval()
+    #     batch = {key: value.to(args.device) for key, value in batch.items()}
+    #     with torch.no_grad():
+    #         ood_keys = model.compute_ood(**batch)
+    #         in_scores.append(ood_keys)
     in_scores = merge_keys(in_scores, keys)
 
-    dataloader = DataLoader(ood, batch_size=args.val_batch_size, collate_fn=collate_fn)
-    out_scores = []
-    for batch in dataloader:
-        model.eval()
-        batch = {key: value.to(args.device) for key, value in batch.items()}
-        with torch.no_grad():
-            ood_keys = model.compute_ood(**batch)
-            out_scores.append(ood_keys)
+    # dataloader = DataLoader(ood, batch_size=args.val_batch_size, collate_fn=collate_fn)
+    # out_scores = []
+    # for batch in dataloader:
+    #     model.eval()
+    #     batch = {key: value.to(args.device) for key, value in batch.items()}
+    #     with torch.no_grad():
+    #         ood_keys = model.compute_ood(**batch)
+    #         out_scores.append(ood_keys)
     out_scores = merge_keys(out_scores, keys)
 
     outputs = {}
@@ -67,9 +69,12 @@ def evaluate_ood(args, model, features, ood, tag):
         # auroc, fpr_95_in, fpr_95_out = get_auroc(labels_in, scores), get_fpr_95(labels_in, scores), get_fpr_95(
         #     labels_out, scores)
 
-        outputs[tag + "_" + key + "_auroc_IN"] = auroc_in
-        outputs[tag + "_" + key + "_fpr95_IN"] = fpr_95_in
-        outputs[tag + "_" + key + "_aupr_IN"] = aupr_in
+        # outputs[tag + "_" + key + "_auroc_IN"] = auroc_in
+        # outputs[tag + "_" + key + "_fpr95_IN"] = fpr_95_in
+        # outputs[tag + "_" + key + "_aupr_IN"] = aupr_in
+        outputs["auroc_IN"] = auroc_in
+        outputs["fpr95_IN"] = fpr_95_in
+        outputs["aupr_IN"] = aupr_in
         # ood_multi30k_softmax_fpr95_IN
 
         # outputs[tag + "_" + key + "_auroc_OUT"] = auroc_out
