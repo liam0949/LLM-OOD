@@ -226,9 +226,9 @@ if __name__ == '__main__':
     print("train size " + args.task_name, len(train_dataset))
     train_dataset.to_pandas().info()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-
+    out_dir = os.path.join(args.save_results_path, args.task_name, str(args.seed),str(args.ib))
     training_args = TrainingArguments(
-        output_dir=os.path.join(args.save_results_path, args.task_name, str(args.seed),str(args.ib)),
+        output_dir=out_dir,
         learning_rate=args.learning_rate,
         lr_scheduler_type="constant",
         warmup_ratio=0.1,
@@ -242,9 +242,10 @@ if __name__ == '__main__':
         evaluation_strategy="steps",
         eval_steps=300,
         logging_steps=300,
-        save_strategy="steps",
+        save_strategy = "steps",
         save_steps=300,
         load_best_model_at_end=True,
+        save_total_limit=2,
         report_to="wandb",
         bf16=True
         # gradient_checkpointing=True,
@@ -268,8 +269,10 @@ if __name__ == '__main__':
     print("Training...")
     llama_trainer.train()
 
+
     print("Testing...")
-    llama_trainer.evaluate(test_dataset)
+    test_acc = llama_trainer.evaluate(test_dataset)
+    wandb.log({"test_acc", test_acc})
     # if do_train:
     #     train_result = trainer.train()
     #     metrics = train_result.metrics
