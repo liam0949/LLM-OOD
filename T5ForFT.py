@@ -208,6 +208,7 @@ if __name__ == '__main__':
     # )
     model.config.output_hidden_states = True
     model.config.keys_to_ignore_at_inference = ["hidden_states"]
+    model.config.keys_to_ignore_at_inference = ["past_key_values"]
 
     # model.print_trainable_parameters()
     # model = prepare_model_for_int8_training(model)
