@@ -18,7 +18,7 @@ from data import load
 import random
 from datasets import load_metric
 import warnings
-from peft import get_peft_model, LoraConfig, TaskType, prepare_model_for_int8_training
+from peft import get_peft_model, LoraConfig, TaskType
 peft_config = LoraConfig(
     task_type=TaskType.SEQ_CLS, r=8, lora_alpha=16, lora_dropout=0.05, bias="none",
     target_modules=[
