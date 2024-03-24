@@ -4,8 +4,9 @@ import torch
 from tqdm import tqdm
 import numpy as np
 from torch.utils.data import DataLoader
-from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer, AutoTokenizer, AutoConfig
-from transformers import  BitsAndBytesConfig
+from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer, AutoTokenizer, AutoConfig, \
+    LlamaTokenizer, LlamaForSequenceClassification
+from transformers import BitsAndBytesConfig
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from utils import set_seed, collate_fn, AverageMeter, accuracy
 from datasets import load_metric
@@ -19,8 +20,10 @@ from data import load
 import random
 from datasets import load_metric
 import warnings
+
 warnings.filterwarnings("ignore")
 from peft import get_peft_model, LoraConfig, TaskType
+
 peft_config = LoraConfig(
     task_type=TaskType.SEQ_CLS, r=8, lora_alpha=16, lora_dropout=0.05, bias="none",
     target_modules=[
@@ -89,7 +92,6 @@ def compute_metrics(eval_pred):
     metric_name = task_to_metric["sst2"]
     metric = evaluate.load("glue", metric_name)
 
-
     logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
     # logits, labels = eval_pred  # eval_pred is the tuple of predictions and labels returned by the model
     # print(len(logits))
@@ -100,7 +102,7 @@ def compute_metrics(eval_pred):
     # print(logits[1][1].shape)
     # print(logits[1].shape)
     # # print(len(logits[1]))
-    logits = logits[0]
+    # logits = logits[0]
 
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
@@ -137,7 +139,7 @@ class ViCELossTrainer(Trainer):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name_or_path", default="/home/liming/projects/llama/hf_models/llama-2-7b-hf", type=str,
-    # parser.add_argument("--model_name_or_path", default="distilbert/distilbert-base-uncased", type=str,
+                        # parser.add_argument("--model_name_or_path", default="distilbert/distilbert-base-uncased", type=str,
                         help="roberta-large;bert-base-uncased")
     parser.add_argument("--max_seq_length", default=512, type=int)
     parser.add_argument("--task_name", default="sst2", type=str)
@@ -170,18 +172,18 @@ if __name__ == '__main__':
     args = parser.parse_args()
     set_seed(args)
 
-    wandb.init(project=args.project_name, name=args.task_name+str(datetime.datetime.now()))
+    wandb.init(project=args.project_name, name=args.task_name + str(datetime.datetime.now()))
     wan_config = wandb.config
     wan_config.learning_rate = args.learning_rate
     # wan_config.task_name = args.task_name
 
     ##load model
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path, add_prefix_space=True)
+    tokenizer = LlamaTokenizer.from_pretrained(args.model_name_or_path, add_prefix_space=True)
     num_labels = task_to_labels[args.task_name]
     tokenizer.pad_token_id = tokenizer.eos_token_id
     tokenizer.pad_token = tokenizer.eos_token
 
-    model = AutoModelForSequenceClassification.from_pretrained(
+    model = LlamaForSequenceClassification.from_pretrained(
         args.model_name_or_path,
         num_labels=num_labels,
         device_map="auto",
@@ -213,8 +215,6 @@ if __name__ == '__main__':
     model.print_trainable_parameters()
     model = model.cuda()
 
-
-
     # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
     # datasets = ['sst2', 'imdb', 'trec', '20ng']
     # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k', 'clinc150']
@@ -227,14 +227,13 @@ if __name__ == '__main__':
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     training_args = TrainingArguments(
-        output_dir=os.path.join(args.save_results_path,args.task_name),
+        output_dir=os.path.join(args.save_results_path, args.task_name),
         learning_rate=args.learning_rate,
         lr_scheduler_type="constant",
         warmup_ratio=0.1,
         max_grad_norm=0.3,
         per_device_train_batch_size=args.batch_size,
         per_device_eval_batch_size=args.val_batch_size,
-        dataloader_drop_last = True,
         num_train_epochs=args.num_train_epochs,
         # gradient_accumulation_steps=4,
         weight_decay=0.001,
