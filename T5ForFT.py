@@ -18,9 +18,9 @@ from data import load
 import random
 from datasets import load_metric
 import warnings
-from peft import get_peft_model, LoraConfig, TaskType
+from peft import get_peft_model, LoraConfig, TaskType, prepare_model_for_int8_training
 peft_config = LoraConfig(
-    task_type=TaskType.SEQ_CLS, r=16, lora_alpha=32, lora_dropout=0.05, bias="none",
+    task_type=TaskType.SEQ_CLS, r=8, lora_alpha=16, lora_dropout=0.05, bias="none",
     target_modules=[
         "q_proj",
         "v_proj",
@@ -138,8 +138,8 @@ if __name__ == '__main__':
     parser.add_argument("--max_seq_length", default=512, type=int)
     parser.add_argument("--task_name", default="sst2", type=str)
 
-    parser.add_argument("--batch_size", default=128, type=int)
-    parser.add_argument("--val_batch_size", default=128, type=int)
+    parser.add_argument("--batch_size", default=64, type=int)
+    parser.add_argument("--val_batch_size", default=64, type=int)
     parser.add_argument("--learning_rate", default=5e-5, type=float)
     parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
     parser.add_argument("--adam_epsilon", default=1e-8, type=float)
@@ -180,8 +180,8 @@ if __name__ == '__main__':
     model = AutoModelForSequenceClassification.from_pretrained(
         args.model_name_or_path,
         num_labels=num_labels,
-        revision="float16",
-        torch_dtype=torch.float16,
+        device_map="auto",
+        load_in_8bit=True,
         trust_remote_code = True
     )
     model.config.pad_token_id = model.config.eos_token_id
@@ -194,6 +194,7 @@ if __name__ == '__main__':
     model.config.keys_to_ignore_at_inference = ["hidden_states"]
 
     # model.print_trainable_parameters()
+    model = prepare_model_for_int8_training(model)
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
     model = model.cuda()
