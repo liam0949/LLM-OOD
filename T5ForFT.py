@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     parser.add_argument("--batch_size", default=64, type=int)
     parser.add_argument("--val_batch_size", default=128, type=int)
-    parser.add_argument("--learning_rate", default=1e-4, type=float)
+    parser.add_argument("--learning_rate", default=5e-5, type=float)
     parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
     parser.add_argument("--adam_epsilon", default=1e-8, type=float)
     parser.add_argument("--warmup_ratio", default=0.06, type=float)
@@ -228,7 +228,7 @@ if __name__ == '__main__':
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     training_args = TrainingArguments(
-        output_dir=os.path.join(args.save_results_path, args.task_name, str(args.seed)),
+        output_dir=os.path.join(args.save_results_path, args.task_name, str(args.seed),str(args.ib)),
         learning_rate=args.learning_rate,
         lr_scheduler_type="constant",
         warmup_ratio=0.1,
@@ -240,10 +240,10 @@ if __name__ == '__main__':
         eval_accumulation_steps=2,
         weight_decay=0.001,
         evaluation_strategy="steps",
-        eval_steps=100,
-        logging_steps=100,
+        eval_steps=300,
+        logging_steps=300,
         save_strategy="steps",
-        save_steps=200,
+        save_steps=300,
         load_best_model_at_end=True,
         report_to="wandb",
         bf16=True
