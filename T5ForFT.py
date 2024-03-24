@@ -18,6 +18,14 @@ from data import load
 import random
 from datasets import load_metric
 import warnings
+from peft import get_peft_model, LoraConfig, TaskType
+peft_config = LoraConfig(
+    task_type=TaskType.SEQ_CLS, r=16, lora_alpha=16, lora_dropout=0.05, bias="none",
+    target_modules=[
+        "q_proj",
+        "v_proj",
+    ],
+)
 warnings.filterwarnings("ignore")
 
 task_to_labels = {
@@ -186,6 +194,8 @@ if __name__ == '__main__':
     model.config.keys_to_ignore_at_inference = ["hidden_states"]
 
     # model.print_trainable_parameters()
+    model = get_peft_model(model, peft_config)
+    model.print_trainable_parameters()
     model = model.cuda()
 
 
