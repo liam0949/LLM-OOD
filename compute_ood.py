@@ -22,7 +22,6 @@ def merge_keys(l, keys):
         new_dict[key] = []
         for i in l:
             new_dict[key].append(i[key])
-        print(new_dict)
         new_dict[key] = np.mean(np.array(new_dict[key]))
     return new_dict
 
@@ -34,9 +33,12 @@ def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
     class_var, class_mean, norm_bank, all_classes = prepare_ood(model,dev_dataloader)
     res = []
     keys = ["auroc_IN", "fpr95_IN", "aupr_IN"]
+
     in_scores = compute_ood(test_dataset, model, class_var, class_mean, norm_bank, all_classes, data_collator)
+
     for tag, ood_features in benchmarks:
-        out_scores = compute_ood(ood_features, model, class_var, class_mean, norm_bank, all_classes, data_collator)
+        dataloader = DataLoader(ood_features, batch_size=128, collate_fn=data_collator)
+        out_scores = compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes, data_collator)
         results = evaluate_ood(in_scores, out_scores)
         # print("ood result", results)
         res.append(results)
@@ -75,10 +77,10 @@ def save_results(args, test_results):
     print(data_diagram)
 
 
-def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classes, data_collator):
+def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classes):
     model.eval()
     in_scores = []
-    dataloader = DataLoader(dev_dataset, batch_size=128, collate_fn=data_collator)
+    # dataloader = DataLoader(dev_dataset, batch_size=128, collate_fn=data_collator)
     for batch in dataloader:
         batch = {key: value.cuda() for key, value in batch.items()}
         labels = batch['labels']
@@ -219,14 +221,14 @@ if __name__ == '__main__':
 
     benchmarks = ()
 
-    # if args.task_name in ["sst2", "imdb"]:
-    #     ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
-    # else:
-    #     ood_datasets = list(set(ood_datasets) - set([args.task_name]))
-    # for dataset in ood_datasets:
-    #     _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
-    #     benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
-    #     ood_dataset.to_pandas().info()
+    if args.task_name in ["sst2", "imdb"]:
+        ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
+    else:
+        ood_datasets = list(set(ood_datasets) - set([args.task_name]))
+    for dataset in ood_datasets:
+        _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
+        benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
+        ood_dataset.to_pandas().info()
 
     # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
     # outputs.hidden_states[-1]
