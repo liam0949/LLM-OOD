@@ -96,7 +96,8 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
 
             # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
             pooled = pooled[:,sequence_lengths]
-            print(pooled.shape)
+            print("ppoled:", pooled.shape)
+            print("sequence_lengths",sequence_lengths )
 
         ood_keys = None
         softmax_score = F.softmax(logits, dim=-1).max(-1)[0]
@@ -165,7 +166,7 @@ def prepare_ood(model, dataloader=None):
 
             # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
             pooled = pooled[:, sequence_lengths]
-            print(pooled.shape)
+           
             if bank is None:
                 bank = pooled.clone().detach()
                 label_bank = labels.clone().detach()
