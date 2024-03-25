@@ -242,17 +242,17 @@ if __name__ == '__main__':
     eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     metric = evaluate.load("accuracy")
     model.eval()
-    # for batch in eval_dataloader:
-    #     batch = {k: v.cuda() for k, v in batch.items()}
-    #     with torch.no_grad():
-    #         outputs = model(**batch)
-    #     logits = outputs.logits
-    #     hs = outputs.hidden_states  # 33 128, 66, 4096
-    #     print(logits.shape)
-    #     break
-    #     predictions = torch.argmax(logits, dim=-1)
-    #     metric.add_batch(predictions=predictions, references=batch["labels"])
-    # print("test acc:", metric.compute())
+    for batch in test_dataloader:
+        batch = {k: v.cuda() for k, v in batch.items()}
+        with torch.no_grad():
+            outputs = model(**batch)
+        logits = outputs.logits
+        hs = outputs.hidden_states  # 33 128, 66, 4096
+        print(logits.shape)
+        break
+        predictions = torch.argmax(logits, dim=-1)
+        metric.add_batch(predictions=predictions, references=batch["labels"])
+    print("test acc:", metric.compute())
     res = detect_ood(model, eval_dataloader, test_dataset, benchmarks, data_collator)
     print(res)
     ## comput OOD
