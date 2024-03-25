@@ -33,9 +33,9 @@ def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
     class_var, class_mean, norm_bank, all_classes = prepare_ood(dev_dataloader)
     res = []
     keys = ["auroc_IN", "fpr95_IN", "aupr_IN"]
-    in_scores = compute_ood(test_dataset, model, class_var, class_mean, norm_bank, all_classes)
+    in_scores = compute_ood(test_dataset, model, class_var, class_mean, norm_bank, all_classes, data_collator)
     for tag, ood_features in benchmarks:
-        out_scores = compute_ood(ood_features, model, class_var, class_mean, norm_bank, all_classes)
+        out_scores = compute_ood(ood_features, model, class_var, class_mean, norm_bank, all_classes, data_collator)
         results = evaluate_ood(in_scores, out_scores)
         # print("ood result", results)
         res.append(results)
@@ -74,17 +74,29 @@ def save_results(args, test_results):
     print(data_diagram)
 
 
-def compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes):
+def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classes, data_collator):
     model.eval()
     in_scores = []
-
+    dataloader = DataLoader(dev_dataset, batch_size=128, collate_fn=data_collator)
     for batch in dataloader:
         batch = {key: value.cuda() for key, value in batch.items()}
         labels = batch['labels']
+        input_ids = batch['input_ids']
         with torch.no_grad():
             outputs = model(**batch)
             logits = outputs.get("logits")
-            pooled = outputs.get("hidden_states")[-1].mean(dim=1)
+            pooled = outputs.get("hidden_states")[-1]
+            if input_ids is not None:
+                # if no pad token found, use modulo instead of reverse indexing for ONNX compatibility
+                sequence_lengths = torch.eq(input_ids, model.config.pad_token_id).int().argmax(-1) - 1
+                sequence_lengths = sequence_lengths % input_ids.shape[-1]
+                # sequence_lengths = sequence_lengths
+            else:
+                sequence_lengths = -1
+
+            # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
+            pooled = pooled[:,sequence_lengths]
+            print(pooled.shape)
 
         ood_keys = None
         softmax_score = F.softmax(logits, dim=-1).max(-1)[0]
@@ -185,7 +197,8 @@ if __name__ == '__main__':
                                         is_id=True)
     # dev_dataset.to_pandas().info()
     # test_dataset.to_pandas().info()
-    ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
+    # ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
+    ood_datasets = ['rte', 'sst2', 'mnli', ]
 
     benchmarks = ()
 
@@ -197,7 +210,6 @@ if __name__ == '__main__':
     #     _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
     #     benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
     #     ood_dataset.to_pandas().info()
-
 
     # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
     # outputs.hidden_states[-1]
@@ -215,12 +227,12 @@ if __name__ == '__main__':
         with torch.no_grad():
             outputs = model(**batch)
         logits = outputs.logits
-        hs = outputs.hidden_states # 33 128, 66, 4096
+        hs = outputs.hidden_states  # 33 128, 66, 4096
         print(logits.shape)
         break
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=batch["labels"])
     print("test acc:", metric.compute())
-    detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator)
+    res = detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator)
+    print(res)
     ## comput OOD
-

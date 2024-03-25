@@ -17,7 +17,7 @@ def merge_keys(l, keys):
 
 
 
-def evaluate_ood( in_scores,out_scores):
+def evaluate_ood(in_scores,out_scores):
 
     keys = ['softmax', 'maha', 'cosine', 'energy']
 
