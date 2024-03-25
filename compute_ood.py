@@ -87,7 +87,7 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
     for batch in dataloader:
         batch = {key: value.cuda() for key, value in batch.items()}
         input_ids = batch['input_ids']
-        batch['labels'] = torch.zeros_like(input_ids.shape[0])
+        batch['labels'] = torch.zeros(input_ids.shape[0])
 
         with torch.no_grad():
             outputs = model(**batch)

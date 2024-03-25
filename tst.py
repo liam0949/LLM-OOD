@@ -9,4 +9,6 @@ ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30
 # id=1
 # id+=1
 # print(id)
-print(5%2)
+import torch
+a = torch.zeros(5)
+print(a)
