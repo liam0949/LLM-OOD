@@ -201,7 +201,11 @@ if __name__ == '__main__':
 
 
     dev_dataset.to_pandas().info()
+
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+    model.config.pad_token_id = model.config.eos_token_id
+    tokenizer.pad_token = tokenizer.eos_token
     # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
     eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn= data_collator)
     metric = evaluate.load("accuracy")
