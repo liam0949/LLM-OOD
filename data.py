@@ -209,11 +209,11 @@ def load_trec(shot, is_id):
     idxs = list(range(len(train_dataset)))
     random.shuffle(idxs)
     num_reserve = int(len(train_dataset) * 0.1)
-    dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label-coarse'], "idx": i} for i in
+    dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['coarse_label'], "idx": i} for i in
                    idxs[-num_reserve:]]
-    train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label-coarse'], "idx": i} for i in
+    train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['coarse_label'], "idx": i} for i in
                      idxs[:-num_reserve]]
-    test_dataset = [{'text': d['text'], 'label': d['label-coarse'], "idx": d["idx"]} for d in test_dataset]
+    test_dataset = [{'text': d['text'], 'label': d['coarse_label'], "idx": d["idx"]} for d in test_dataset]
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "trec")
     #     dev_dataset = select_few_shot(shot, dev_dataset, "trec")
