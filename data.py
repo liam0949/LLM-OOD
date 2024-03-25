@@ -190,7 +190,7 @@ def load_20ng(shot, is_id):
     test_dataset = []
     for i, subset in enumerate(all_subsets):
         dataset = load_dataset('newsgroup', subset)['train']
-        examples = [{'text': d['text'], 'label': i, "idx": d["idx"]} for d in dataset]
+        examples = [{'text': d['text'], 'label': i, "idx": idx} for idx, d in enumerate(dataset)]
         random.shuffle(examples)
         num_train = int(0.8 * len(examples))
         num_dev = int(0.1 * len(examples))
