@@ -13,6 +13,7 @@ import os
 import pandas as pd
 from utils import find_subdir_with_smallest_number
 from config import parse_args
+import evaluate
 
 
 
@@ -174,32 +175,46 @@ if __name__ == '__main__':
     model = AutoPeftModelForSequenceClassification.from_pretrained(out_dir)
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
     model = model.to("cuda")
+    model.config.output_hidden_states =True
     print(model.config.output_hidden_states)
-    model.eval()
 
-    # ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
-    #
-    # benchmarks = ()
-    #
+
+
+    ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
+
+    benchmarks = ()
+
     # if args.task_name in ["sst2", "imdb"]:
     #     ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
     # else:
     #     ood_datasets = list(set(ood_datasets) - set([args.task_name]))
-    #
-    # _, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
-    #                                                 is_id=True)
-    # dev_dataset.to_pandas().info()
-    # test_dataset.to_pandas().info()
-    #
+
+    _, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
+                                                    is_id=True)
+    dev_dataset.to_pandas().info()
+    test_dataset.to_pandas().info()
+
     # for dataset in ood_datasets:
     #     _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
     #     benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
     #     ood_dataset.to_pandas().info()
-    #
-    #
-    # # dev_dataset.to_pandas().info()
-    # data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
+
+    dev_dataset.to_pandas().info()
+    # data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+    # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
+    eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size)
+    metric = evaluate.load("accuracy")
+    model.eval()
+    for batch in eval_dataloader:
+        batch = {k: v.to(device) for k, v in batch.items()}
+        with torch.no_grad():
+            outputs = model(**batch)
+
+        logits = outputs.logits
+        predictions = torch.argmax(logits, dim=-1)
+        metric.add_batch(predictions=predictions, references=batch["labels"])
+    print("eval acc:", metric.compute())
 
 
 
