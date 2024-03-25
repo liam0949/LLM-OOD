@@ -15,7 +15,7 @@ from utils import find_subdir_with_smallest_number
 from config import parse_args
 import evaluate
 
-CUDA_LAUNCH_BLOCKING=1
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 def merge_keys(l, keys):
     new_dict = {}
