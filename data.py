@@ -30,7 +30,7 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
         datasets = load_glue(task_name)
         if task_name=="mnli":
             col_to_delete = ['idx',"premise", "hypothesis"]
-        if task_name = "rte":
+        if task_name == "rte":
             col_to_delete = ['idx',"sentence1", "sentence2"]
     elif task_name == 'sst2':
         # print("in sst2")
