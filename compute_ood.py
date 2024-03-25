@@ -166,8 +166,8 @@ def prepare_ood(model, dataloader=None):
             # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
             pooled = pooled[:, sequence_lengths]
             print("ppoled:", pooled.shape)
-            print("sequence_lengths", sequence_lengths)
-            
+            print("sequence_lengths", sequence_lengths.shape)
+
             if bank is None:
                 bank = pooled.clone().detach()
                 label_bank = labels.clone().detach()
