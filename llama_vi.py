@@ -30,6 +30,8 @@ peft_config = LoraConfig(
     target_modules=[
         "q_proj",
         "v_proj",
+        "k_proj",
+        "out_proj"
     ],
 )
 
@@ -138,39 +140,6 @@ class ViCELossTrainer(Trainer):
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("--model_name_or_path", default="/home/liming/projects/llama/hf_models/llama-2-7b-hf", type=str,
-    #                     # parser.add_argument("--model_name_or_path", default="distilbert/distilbert-base-uncased", type=str,
-    #                     help="roberta-large;bert-base-uncased")
-    # parser.add_argument("--max_seq_length", default=512, type=int)
-    # parser.add_argument("--task_name", default="sst2", type=str)
-    #
-    # parser.add_argument("--batch_size", default=64, type=int)
-    # parser.add_argument("--val_batch_size", default=128, type=int)
-    # parser.add_argument("--learning_rate", default=1e-4, type=float)
-    # parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
-    # parser.add_argument("--adam_epsilon", default=1e-8, type=float)
-    # parser.add_argument("--warmup_ratio", default=0.06, type=float)
-    # parser.add_argument("--weight_decay", default=0.001, type=float)
-    # parser.add_argument("--num_train_epochs", default=3, type=float)
-    # parser.add_argument("--seed", type=int, default=88)
-    # parser.add_argument("--project_name", type=str, default="coling2024_ood")
-    # parser.add_argument("--shot", type=int, default=100)
-    # parser.add_argument("--freeze", action='store_true', help="freeze the model")
-    # parser.add_argument("--save_results_path", type=str, default='/home/liming/model_cps/LLM-OOD',
-    #                     help="the path to save results")
-    #
-    # parser.add_argument("--ib", action="store_true", help="If specified, uses the information bottleneck to reduce\
-    #                     the dimensions.")
-    # parser.add_argument("--kl_annealing", choices=[None, "linear"], default='linear', type=str)
-    # parser.add_argument("--deterministic", action="store_true", help="If specified, learns the reduced dimensions\
-    #                     through mlp in a deterministic manner.")
-    #
-    # parser.add_argument("--beta", type=float, default=1e-3, help="Defines the weight for the information bottleneck\
-    #                     loss.")
-    # parser.add_argument("--sample_size", type=int, default=20, help="Defines the number of samples for the ib method.")
-    #
-    # args = parser.parse_args()
     args = parse_args("train")
     set_seed(args)
 
@@ -210,7 +179,7 @@ if __name__ == '__main__':
     # )
     model.config.output_hidden_states = True
     # model.config.keys_to_ignore_at_inference = ["hidden_states"]
-    model.config.keys_to_ignore_at_inference = ["past_key_values","hidden_states"]
+    model.config.keys_to_ignore_at_inference = ["past_key_values", "hidden_states"]
 
     # model.print_trainable_parameters()
     # model = prepare_model_for_int8_training(model)
@@ -229,7 +198,7 @@ if __name__ == '__main__':
     print("train size " + args.task_name, len(train_dataset))
     train_dataset.to_pandas().info()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-    out_dir = os.path.join(args.save_results_path, args.task_name, str(args.seed),str(args.ib))
+    out_dir = os.path.join(args.save_results_path, args.task_name, str(args.seed), str(args.ib))
     training_args = TrainingArguments(
         output_dir=out_dir,
         learning_rate=args.learning_rate,
@@ -245,7 +214,7 @@ if __name__ == '__main__':
         evaluation_strategy="steps",
         eval_steps=500,
         logging_steps=500,
-        save_strategy = "steps",
+        save_strategy="steps",
         save_steps=500,
         load_best_model_at_end=True,
         save_total_limit=2,
@@ -271,7 +240,6 @@ if __name__ == '__main__':
     # Launch training and log metrics
     print("Training...")
     llama_trainer.train()
-
 
     print("Testing...")
     test_acc = llama_trainer.evaluate(test_dataset)
