@@ -29,7 +29,7 @@ def merge_keys(l, keys):
 # outputs["auroc_IN"] = auroc_in
 # outputs["fpr95_IN"] = fpr_95_in
 # outputs["aupr_IN"] = aupr_in
-def detect_ood(model, dev_dataloader, test_dataset, benchmarks ):
+def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator ):
     class_var, class_mean, norm_bank, all_classes = prepare_ood(dev_dataloader)
     res = []
     keys = ["auroc_IN", "fpr95_IN", "aupr_IN"]
@@ -194,20 +194,20 @@ if __name__ == '__main__':
 
     benchmarks = ()
 
-    if args.task_name in ["sst2", "imdb"]:
-        ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
-    else:
-        ood_datasets = list(set(ood_datasets) - set([args.task_name]))
-    for dataset in ood_datasets:
-        _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
-        benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
-        ood_dataset.to_pandas().info()
+    # if args.task_name in ["sst2", "imdb"]:
+    #     ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
+    # else:
+    #     ood_datasets = list(set(ood_datasets) - set([args.task_name]))
+    # for dataset in ood_datasets:
+    #     _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
+    #     benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
+    #     ood_dataset.to_pandas().info()
 
 
     # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
 
     ##test acc
-    test_dataloader = DataLoader(text_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
+    test_dataloader = DataLoader(test_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     metric = evaluate.load("accuracy")
     model.eval()
@@ -215,11 +215,13 @@ if __name__ == '__main__':
         batch = {k: v.cuda() for k, v in batch.items()}
         with torch.no_grad():
             outputs = model(**batch)
-
         logits = outputs.logits
+        hs = outputs.hidden_states
+        print(hs.shape)
+        break
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=batch["labels"])
     print("test acc:", metric.compute())
-    detect_ood(model, dev_dataloader, test_dataset, benchmarks )
+    detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator )
     ## comput OOD
 
