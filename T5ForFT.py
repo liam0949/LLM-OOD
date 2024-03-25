@@ -203,7 +203,7 @@ if __name__ == '__main__':
     training_args = TrainingArguments(
         output_dir=out_dir,
         learning_rate=args.learning_rate,
-        lr_scheduler_type="linear",
+        lr_scheduler_type="constant",
         warmup_ratio=0.1,
         # max_grad_norm=0.3,
         per_device_train_batch_size=args.batch_size,
