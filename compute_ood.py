@@ -16,7 +16,8 @@ from config import parse_args
 import evaluate
 
 # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cudnn.allow_tf32 = True
 def merge_keys(l, keys):
     new_dict = {}
     for key in keys:
