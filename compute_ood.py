@@ -211,7 +211,7 @@ if __name__ == '__main__':
     metric = evaluate.load("accuracy")
     model.eval()
     for batch in eval_dataloader:
-        batch = {k: v.to(device) for k, v in batch.items()}
+        batch = {k: v.cuda() for k, v in batch.items()}
         with torch.no_grad():
             outputs = model(**batch)
 
