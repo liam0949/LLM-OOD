@@ -100,7 +100,7 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
                 sequence_lengths = -1
 
             # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
-            pooled = pooled[torch.arange(batch_size), sequence_lengths]
+            pooled = pooled[torch.arange(batch_size).cuda(), sequence_lengths]
 
 
         ood_keys = None
