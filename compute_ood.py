@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader
 import os
 import pandas as pd
 from utils import find_subdir_with_smallest_number
+from config import parse_args
 
 
 
@@ -163,7 +164,7 @@ def prepare_ood(model, dataloader=None):
     return class_var, class_mean, norm_bank, all_classes
 
 if __name__ == '__main__':
-    args = configs.parse_args("test")
+    args = parse_args("test")
     out_dir = os.path.join(args.save_results_path, args.task_name, str(args.seed),str(args.ib))
     out_dir = find_subdir_with_smallest_number(out_dir)
     assert out_dir is not None
