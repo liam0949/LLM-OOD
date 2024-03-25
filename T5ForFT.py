@@ -30,6 +30,8 @@ peft_config = LoraConfig(
     target_modules=[
         "q_proj",
         "v_proj",
+        "k_proj",
+        "out_proj"
     ],
 )
 
