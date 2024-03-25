@@ -28,10 +28,10 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     print("Loading {}".format(task_name))
     if task_name in ('mnli', 'rte'):
         datasets = load_glue(task_name)
-        if task_name=="mnli":
-            col_to_delete = ['idx',"premise", "hypothesis"]
+        if task_name == "mnli":
+            col_to_delete = ['idx', "premise", "hypothesis"]
         if task_name == "rte":
-            col_to_delete = ['idx',"sentence1", "sentence2"]
+            col_to_delete = ['idx', "sentence1", "sentence2"]
     elif task_name == 'sst2':
         # print("in sst2")
         datasets = load_sst2(shot, is_id)
@@ -58,7 +58,6 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     elif task_name == 'bank':
         datasets = load_uood(is_id, shot=shot)
 
-
     def preprocess_function(examples):
         inputs = (
             (examples[sentence1_key],) if sentence2_key is None else (
@@ -67,13 +66,16 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
         result = tokenizer(*inputs, max_length=max_seq_length, truncation=True)
         # result["labels"] = examples["label"] if 'label' in examples else 0
         return result
+
     # print(type(datasets['train']))
     # train_dataset.to_pandas().info()
-    train_dataset = datasets["train"].map(preprocess_function, batched=True,remove_columns = col_to_delete) if 'train' in datasets and is_id else None
-    dev_dataset = datasets["validation"].map(preprocess_function, batched=True, remove_columns = col_to_delete) if 'validation' in datasets and is_id else None
-    test_dataset = datasets["test"].map(preprocess_function, batched=True, remove_columns="sentence") if 'test' in datasets else None
+    train_dataset = datasets["train"].map(preprocess_function, batched=True,
+                                          remove_columns=col_to_delete) if 'train' in datasets and is_id else None
+    dev_dataset = datasets["validation"].map(preprocess_function, batched=True,
+                                             remove_columns=col_to_delete) if 'validation' in datasets and is_id else None
+    test_dataset = datasets["test"].map(preprocess_function, batched=True,
+                                        remove_columns="sentence") if 'test' in datasets else None
     import pandas as pd
-
 
     # train_dataset = list(map(preprocess_function, datasets['train'])) if 'train' in datasets and is_id else None
     # dev_dataset = list(map(preprocess_function, datasets['validation'])) if 'validation' in datasets and is_id else None
@@ -89,7 +91,7 @@ def load_glue(task):
     datasets = load_dataset("glue", task)
     if task == 'mnli':
         test_dataset = [d for d in datasets['test_matched']] + [d for d in datasets['test_mismatched']]
-        datasets['test'] = test_dataset
+        datasets['test'] = Dataset.from_list(test_dataset)
     return datasets
 
 
@@ -110,7 +112,7 @@ def load_clinc(is_id, shot=100, data_dir="/home/bossjobai/LLM_Projects/datasets/
         # train_dataset = select_few_shot(shot, train_dataset, "clinc150")
         # dev_dataset = select_few_shot(shot, dev_dataset, "clinc150")
         # dev_dataset = select_few_shot(shot, dev_dataset, "clinc150")
-        datasets = {'train': train_dataset, 'validation': dev_dataset, 'test': test_dataset}
+        datasets = {'train': Dataset.from_list(train_dataset), 'validation': Dataset.from_list(dev_dataset), 'test': Dataset.from_list(test_dataset)}
     else:
         test_dataset = _get_ood(
             _read_tsv(os.path.join(data_dir, "test.tsv")), ["oos"])
@@ -118,7 +120,8 @@ def load_clinc(is_id, shot=100, data_dir="/home/bossjobai/LLM_Projects/datasets/
     return datasets
 
 
-def load_uood(is_id, shot=100000000, data_dir="/home/bossjobai/LLM_Projects/datasets/banking", known_cls_ratio=0.5, dataname='bank'):
+def load_uood(is_id, shot=100000000, data_dir="/home/bossjobai/LLM_Projects/datasets/banking", known_cls_ratio=0.5,
+              dataname='bank'):
     all_label_list_pos = get_labels(data_dir)
     n_known_cls = round(len(all_label_list_pos) * known_cls_ratio)
     known_label_list = list(
@@ -193,7 +196,7 @@ def load_20ng(shot, is_id):
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "20ng")
     #     dev_dataset = select_few_shot(shot, dev_dataset, "20ng")
-    datasets = {'train': train_dataset, 'validation': dev_dataset, 'test': test_dataset}
+    datasets = {'train': Dataset.from_list(train_dataset), 'validation': Dataset.from_list(dev_dataset), 'test': Dataset.from_list(test_dataset)}
     return datasets
 
 
@@ -212,7 +215,8 @@ def load_trec(shot, is_id):
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "trec")
     #     dev_dataset = select_few_shot(shot, dev_dataset, "trec")
-    datasets = {'train': train_dataset, 'validation': dev_dataset, 'test': test_dataset}
+    datasets = {'train': Dataset.from_list(train_dataset), 'validation': Dataset.from_list(dev_dataset),
+                'test': Dataset.from_list(test_dataset)}
     return datasets
 
 
@@ -229,14 +233,15 @@ def load_imdb(shot, is_id):
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "imdb")
     #     dev_dataset = select_few_shot(shot, dev_dataset, "imdb")
-    datasets = {'train': train_dataset, 'validation': dev_dataset, 'test': test_dataset}
+    datasets = {'train': Dataset.from_list(train_dataset), 'validation': Dataset.from_list(dev_dataset),
+                'test': test_dataset}
     return datasets
 
 
 def load_wmt16():
     datasets = load_dataset('wmt16', 'de-en')
     test_dataset = [d['translation'] for d in datasets['test']]
-    datasets = {'test': test_dataset}
+    datasets = {'test': Dataset.from_list(test_dataset)}
     return datasets
 
 
@@ -250,7 +255,7 @@ def load_multi30k():
                 if len(line) > 0:
                     example = {'text': line, 'label': 0}
                     test_dataset.append(example)
-    datasets = {'test': test_dataset}
+    datasets = {'test': Dataset.from_list(test_dataset)}
     return datasets
 
 
