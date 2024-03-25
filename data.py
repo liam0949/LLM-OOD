@@ -112,7 +112,8 @@ def load_clinc(is_id, shot=100, data_dir="/home/bossjobai/LLM_Projects/datasets/
         # train_dataset = select_few_shot(shot, train_dataset, "clinc150")
         # dev_dataset = select_few_shot(shot, dev_dataset, "clinc150")
         # dev_dataset = select_few_shot(shot, dev_dataset, "clinc150")
-        datasets = {'train': Dataset.from_list(train_dataset), 'validation': Dataset.from_list(dev_dataset), 'test': Dataset.from_list(test_dataset)}
+        datasets = {'train': Dataset.from_list(train_dataset), 'validation': Dataset.from_list(dev_dataset),
+                    'test': Dataset.from_list(test_dataset)}
     else:
         test_dataset = _get_ood(
             _read_tsv(os.path.join(data_dir, "test.tsv")), ["oos"])
@@ -186,7 +187,7 @@ def load_20ng(shot, is_id):
     test_dataset = []
     for i, subset in enumerate(all_subsets):
         dataset = load_dataset('newsgroup', subset)['train']
-        examples = [{'text': d['text'], 'label': i} for d in dataset]
+        examples = [{'text': d['text'], 'label': i,"idx": d["idx"] } for d in dataset]
         random.shuffle(examples)
         num_train = int(0.8 * len(examples))
         num_dev = int(0.1 * len(examples))
@@ -196,7 +197,8 @@ def load_20ng(shot, is_id):
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "20ng")
     #     dev_dataset = select_few_shot(shot, dev_dataset, "20ng")
-    datasets = {'train': Dataset.from_list(train_dataset), 'validation': Dataset.from_list(dev_dataset), 'test': Dataset.from_list(test_dataset)}
+    datasets = {'train': Dataset.from_list(train_dataset), 'validation': Dataset.from_list(dev_dataset),
+                'test': Dataset.from_list(test_dataset)}
     return datasets
 
 
@@ -207,11 +209,11 @@ def load_trec(shot, is_id):
     idxs = list(range(len(train_dataset)))
     random.shuffle(idxs)
     num_reserve = int(len(train_dataset) * 0.1)
-    dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label-coarse']} for i in
+    dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label-coarse'], "idx": i} for i in
                    idxs[-num_reserve:]]
-    train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label-coarse']} for i in
+    train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label-coarse']. "idx": i} for i in
                      idxs[:-num_reserve]]
-    test_dataset = [{'text': d['text'], 'label': d['label-coarse']} for d in test_dataset]
+    test_dataset = [{'text': d['text'], 'label': d['label-coarse'], "idx": d["idx"]} for d in test_dataset]
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "trec")
     #     dev_dataset = select_few_shot(shot, dev_dataset, "trec")
@@ -226,8 +228,8 @@ def load_imdb(shot, is_id):
     idxs = list(range(len(train_dataset)))
     random.shuffle(idxs)
     num_reserve = int(len(train_dataset) * 0.1)
-    dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label']} for i in idxs[-num_reserve:]]
-    train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label']} for i in
+    dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label'], "idx": i} for i in idxs[-num_reserve:]]
+    train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label'], "idx": i} for i in
                      idxs[:-num_reserve]]
     test_dataset = datasets['test']
     # if is_id:
@@ -250,11 +252,13 @@ def load_multi30k():
     for file_name in ('./data/multi30k/test_2016_flickr.en', './data/multi30k/test_2017_mscoco.en',
                       './data/multi30k/test_2018_flickr.en'):
         with open(file_name, 'r') as fh:
+            id = 0
             for line in fh:
                 line = line.strip()
                 if len(line) > 0:
-                    example = {'text': line, 'label': 0}
+                    example = {'text': line, 'label': 0, "idx": id}
                     test_dataset.append(example)
+                id += 1
     datasets = {'test': Dataset.from_list(test_dataset)}
     return datasets
 
@@ -262,14 +266,16 @@ def load_multi30k():
 def load_sst2(shot, is_id):
     def process(file_name):
         examples = []
+        id = 0
         with open(file_name, 'r') as fh:
             for line in fh:
                 splits = line.split()
                 label = splits[0]
                 text = " ".join(splits[1:])
                 examples.append(
-                    {'sentence': text, 'label': int(label)}
+                    {'sentence': text, 'label': int(label), "idx": id}
                 )
+                id += 1
         return examples
 
     datasets = load_dataset('glue', 'sst2')

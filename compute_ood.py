@@ -29,7 +29,7 @@ def merge_keys(l, keys):
 # outputs["auroc_IN"] = auroc_in
 # outputs["fpr95_IN"] = fpr_95_in
 # outputs["aupr_IN"] = aupr_in
-def detect_ood(model, dev_dataloader, test_dataset):
+def detect_ood(model, dev_dataloader, test_dataset, benchmarks ):
     class_var, class_mean, norm_bank, all_classes = prepare_ood(dev_dataloader)
     res = []
     keys = ["auroc_IN", "fpr95_IN", "aupr_IN"]
@@ -219,6 +219,6 @@ if __name__ == '__main__':
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=batch["labels"])
     print("test acc:", metric.compute())
-    detect_ood()
+    detect_ood(model, dev_dataloader, test_dataset, benchmarks )
     ## comput OOD
 
