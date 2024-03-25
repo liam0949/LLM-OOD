@@ -31,10 +31,12 @@ def merge_keys(l, keys):
 # outputs["aupr_IN"] = aupr_in
 def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
     class_var, class_mean, norm_bank, all_classes = prepare_ood(model,dev_dataloader)
+    print("finshed prepare")
     res = []
     keys = ["auroc_IN", "fpr95_IN", "aupr_IN"]
 
     in_scores = compute_ood(test_dataset, model, class_var, class_mean, norm_bank, all_classes)
+    print("in_scores",len(in_scores))
 
     for tag, ood_features in benchmarks:
         dataloader = DataLoader(ood_features, batch_size=128, collate_fn=data_collator)
@@ -84,11 +86,11 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
     for batch in dataloader:
         batch = {key: value.cuda() for key, value in batch.items()}
         # labels = batch['labels']
+        input_ids = batch['input_ids']
         with torch.no_grad():
             outputs = model(**batch)
             logits = outputs.get("logits")
             pooled = outputs.get("hidden_states")[-1]
-            input_ids = batch['input_ids']
 
             if input_ids is not None:
                 batch_size = input_ids.shape[0]
@@ -100,7 +102,7 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
                 sequence_lengths = -1
 
             # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
-            pooled = pooled[torch.arange(batch_size).cuda(), sequence_lengths]
+            pooled = pooled[torch.arange(batch_size,device=pooled.device ), sequence_lengths]
 
 
         ood_keys = None
@@ -182,7 +184,7 @@ def prepare_ood(model, dataloader=None):
                 bank = torch.cat([bank, bank], dim=0)
                 label_bank = torch.cat([label_bank, label_bank], dim=0)
 
-    norm_bank = F.normalize(bank, dim=-1)
+    norm_bank = F.normalize(bank, dim=-1).cuda()
     N, d = bank.size()
     all_classes = list(set(label_bank.tolist()))
     class_mean = torch.zeros(max(all_classes) + 1, d).cuda()
