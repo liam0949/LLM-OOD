@@ -87,6 +87,7 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
             logits = outputs.get("logits")
             pooled = outputs.get("hidden_states")[-1]
             if input_ids is not None:
+                batch_size = input_ids.shape[0]
                 # if no pad token found, use modulo instead of reverse indexing for ONNX compatibility
                 sequence_lengths = torch.eq(input_ids, model.config.pad_token_id).int().argmax(-1) - 1
                 sequence_lengths = sequence_lengths % input_ids.shape[-1]
@@ -95,7 +96,7 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
                 sequence_lengths = -1
 
             # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
-            pooled = pooled[:,sequence_lengths]
+            pooled = pooled[torch.arange(batch_size), sequence_lengths]
 
 
         ood_keys = None
@@ -156,6 +157,7 @@ def prepare_ood(model, dataloader=None):
             pooled = outputs.get("hidden_states")[-1]
 
             if input_ids is not None:
+                batch_size = input_ids.shape[0]
                 # if no pad token found, use modulo instead of reverse indexing for ONNX compatibility
                 sequence_lengths = torch.eq(input_ids, model.config.pad_token_id).int().argmax(-1) - 1
                 sequence_lengths = sequence_lengths % input_ids.shape[-1]
@@ -163,10 +165,9 @@ def prepare_ood(model, dataloader=None):
             else:
                 sequence_lengths = -1
 
-            # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
-            pooled = pooled[:, sequence_lengths]
-            print("ppoled:", pooled.shape)
-            print("sequence_lengths", sequence_lengths.shape)
+            pooled = pooled[torch.arange(batch_size), sequence_lengths]
+            # pooled = pooled[:, sequence_lengths]
+            print("poled:", pooled.shape)
 
             if bank is None:
                 bank = pooled.clone().detach()
