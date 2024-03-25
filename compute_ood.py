@@ -1,15 +1,17 @@
-from peft import AutoPeftModelForCausalLM
+from peft import AutoPeftModelForSequenceClassification
 from transformers import AutoTokenizer
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from torch.nn import CrossEntropyLoss, MSELoss
-
+from data import load
 from sklearn.covariance import EmpiricalCovariance
 from evaluation import evaluate_ood
+from torch.utils.data import DataLoader
 import os
 import pandas as pd
+from utils import find_subdir_with_smallest_number
 
 
 
@@ -113,6 +115,10 @@ def compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes
     return in_scores
 
 
+# from torch.utils.data import DataLoader
+#
+# train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
+# eval_dataloader = DataLoader(small_eval_dataset, batch_size=8)
 # metric = evaluate.load("accuracy")
 # model.eval()
 # for batch in eval_dataloader:
@@ -157,9 +163,41 @@ def prepare_ood(model, dataloader=None):
     return class_var, class_mean, norm_bank, all_classes
 
 if __name__ == '__main__':
-    model = AutoPeftModelForCausalLM.from_pretrained("ybelkada/opt-350m-lora")
-    tokenizer = AutoTokenizer.from_pretrained("facebook/opt-350m")
+    args = configs.parse_args("test")
+    out_dir = os.path.join(args.save_results_path, args.task_name, str(args.seed),str(args.ib))
+    out_dir = find_subdir_with_smallest_number(out_dir)
+    assert out_dir is not None
 
+    model = AutoPeftModelForSequenceClassification.from_pretrained(out_dir)
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
     model = model.to("cuda")
+    print(model.config.output_hidden_states)
     model.eval()
+
+    # ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
+    #
+    # benchmarks = ()
+    #
+    # if args.task_name in ["sst2", "imdb"]:
+    #     ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
+    # else:
+    #     ood_datasets = list(set(ood_datasets) - set([args.task_name]))
+    #
+    # _, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
+    #                                                 is_id=True)
+    # dev_dataset.to_pandas().info()
+    # test_dataset.to_pandas().info()
+    #
+    # for dataset in ood_datasets:
+    #     _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
+    #     benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
+    #     ood_dataset.to_pandas().info()
+    #
+    #
+    # # dev_dataset.to_pandas().info()
+    # data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+
+
+
 

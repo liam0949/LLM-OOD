@@ -19,6 +19,7 @@ import evaluate
 from data import load
 import random
 from datasets import load_metric
+from config import parse_args
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -137,39 +138,40 @@ class ViCELossTrainer(Trainer):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model_name_or_path", default="/home/liming/projects/llama/hf_models/llama-2-7b-hf", type=str,
-                        # parser.add_argument("--model_name_or_path", default="distilbert/distilbert-base-uncased", type=str,
-                        help="roberta-large;bert-base-uncased")
-    parser.add_argument("--max_seq_length", default=512, type=int)
-    parser.add_argument("--task_name", default="sst2", type=str)
-
-    parser.add_argument("--batch_size", default=64, type=int)
-    parser.add_argument("--val_batch_size", default=128, type=int)
-    parser.add_argument("--learning_rate", default=1e-4, type=float)
-    parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
-    parser.add_argument("--adam_epsilon", default=1e-8, type=float)
-    parser.add_argument("--warmup_ratio", default=0.06, type=float)
-    parser.add_argument("--weight_decay", default=0.001, type=float)
-    parser.add_argument("--num_train_epochs", default=3, type=float)
-    parser.add_argument("--seed", type=int, default=88)
-    parser.add_argument("--project_name", type=str, default="coling2024_ood")
-    parser.add_argument("--shot", type=int, default=100)
-    parser.add_argument("--freeze", action='store_true', help="freeze the model")
-    parser.add_argument("--save_results_path", type=str, default='/home/liming/model_cps/LLM-OOD',
-                        help="the path to save results")
-
-    parser.add_argument("--ib", action="store_true", help="If specified, uses the information bottleneck to reduce\
-                        the dimensions.")
-    parser.add_argument("--kl_annealing", choices=[None, "linear"], default='linear', type=str)
-    parser.add_argument("--deterministic", action="store_true", help="If specified, learns the reduced dimensions\
-                        through mlp in a deterministic manner.")
-
-    parser.add_argument("--beta", type=float, default=1e-3, help="Defines the weight for the information bottleneck\
-                        loss.")
-    parser.add_argument("--sample_size", type=int, default=20, help="Defines the number of samples for the ib method.")
-
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--model_name_or_path", default="/home/liming/projects/llama/hf_models/llama-2-7b-hf", type=str,
+    #                     # parser.add_argument("--model_name_or_path", default="distilbert/distilbert-base-uncased", type=str,
+    #                     help="roberta-large;bert-base-uncased")
+    # parser.add_argument("--max_seq_length", default=512, type=int)
+    # parser.add_argument("--task_name", default="sst2", type=str)
+    #
+    # parser.add_argument("--batch_size", default=64, type=int)
+    # parser.add_argument("--val_batch_size", default=128, type=int)
+    # parser.add_argument("--learning_rate", default=1e-4, type=float)
+    # parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
+    # parser.add_argument("--adam_epsilon", default=1e-8, type=float)
+    # parser.add_argument("--warmup_ratio", default=0.06, type=float)
+    # parser.add_argument("--weight_decay", default=0.001, type=float)
+    # parser.add_argument("--num_train_epochs", default=3, type=float)
+    # parser.add_argument("--seed", type=int, default=88)
+    # parser.add_argument("--project_name", type=str, default="coling2024_ood")
+    # parser.add_argument("--shot", type=int, default=100)
+    # parser.add_argument("--freeze", action='store_true', help="freeze the model")
+    # parser.add_argument("--save_results_path", type=str, default='/home/liming/model_cps/LLM-OOD',
+    #                     help="the path to save results")
+    #
+    # parser.add_argument("--ib", action="store_true", help="If specified, uses the information bottleneck to reduce\
+    #                     the dimensions.")
+    # parser.add_argument("--kl_annealing", choices=[None, "linear"], default='linear', type=str)
+    # parser.add_argument("--deterministic", action="store_true", help="If specified, learns the reduced dimensions\
+    #                     through mlp in a deterministic manner.")
+    #
+    # parser.add_argument("--beta", type=float, default=1e-3, help="Defines the weight for the information bottleneck\
+    #                     loss.")
+    # parser.add_argument("--sample_size", type=int, default=20, help="Defines the number of samples for the ib method.")
+    #
+    # args = parser.parse_args()
+    args = parse_args("train")
     set_seed(args)
 
     wandb.init(project=args.project_name, name=args.task_name + str(datetime.datetime.now()))
@@ -220,6 +222,7 @@ if __name__ == '__main__':
     # datasets = ['sst2', 'imdb', 'trec', '20ng']
     # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k', 'clinc150']
     # datasets = ['clinc150', 'bank', 'rostd']
+
     benchmarks = ()
     train_dataset, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
                                                     is_id=True)

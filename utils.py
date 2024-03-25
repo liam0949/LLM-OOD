@@ -60,3 +60,46 @@ def accuracy(output, target, topk=(1,)):
             res.append(correct_k.mul_(100.0 / batch_size))
         return res[0]
 
+
+import os
+
+# Mock base directory for demonstration purposes
+# base_dir = "/mnt/data/example_base_dir"
+#
+# # Create mock directories to simulate the Linux filesystem structure for this example
+# os.makedirs(f"{base_dir}/checkpoints-600", exist_ok=True)
+# os.makedirs(f"{base_dir}/checkpoints-700", exist_ok=True)
+# os.makedirs(f"{base_dir}/checkpoints-500", exist_ok=True)
+
+
+def find_subdir_with_smallest_number(base_dir):
+    subdirs = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
+    filtered_subdirs = [d for d in subdirs if d.startswith("checkpoints-")]
+
+    if not filtered_subdirs:
+        return None  # No sub directories found
+
+    # Extract numbers and find the subdir with the smallest number
+    min_number = float('inf')
+    min_subdir = None
+    for subdir in filtered_subdirs:
+        try:
+            number = int(subdir.split("-")[-1])
+            if number < min_number:
+                min_number = number
+                min_subdir = subdir
+        except ValueError:
+            # Skip subdirs that do not end with a number
+            continue
+
+    if min_subdir is not None:
+        return os.path.abspath(os.path.join(base_dir, min_subdir))
+    else:
+        return None  # No valid subdir found
+
+
+# Find the requested subdir
+# result = find_subdir_with_smallest_number(base_dir)
+# result
+
+
