@@ -1,5 +1,5 @@
 from peft import AutoPeftModelForSequenceClassification
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer,DataCollatorWithPadding
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
     model = model.to("cuda")
     model.config.output_hidden_states =True
-    print(model.config.output_hidden_states)
+    # print(model.config.output_hidden_states)
 
 
 
@@ -192,7 +192,7 @@ if __name__ == '__main__':
     _, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
                                                     is_id=True)
     dev_dataset.to_pandas().info()
-    test_dataset.to_pandas().info()
+    # test_dataset.to_pandas().info()
 
     # for dataset in ood_datasets:
     #     _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
@@ -201,9 +201,9 @@ if __name__ == '__main__':
 
 
     dev_dataset.to_pandas().info()
-    # data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
-    eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size)
+    eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, data_collator= data_collator)
     metric = evaluate.load("accuracy")
     model.eval()
     for batch in eval_dataloader:

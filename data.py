@@ -28,8 +28,12 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     print("Loading {}".format(task_name))
     if task_name in ('mnli', 'rte'):
         datasets = load_glue(task_name)
+        if task_name=="mnli":
+            col_to_delete = ['idx',"premise", "hypothesis"]
+        if task_name = "rte":
+            col_to_delete = ['idx',"sentence1", "sentence2"]
     elif task_name == 'sst2':
-        print("in sst2")
+        # print("in sst2")
         datasets = load_sst2(shot, is_id)
         col_to_delete = ['idx', 'sentence']
     elif task_name == '20ng':
@@ -43,8 +47,10 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
         col_to_delete = ['idx', 'text']
     elif task_name == 'wmt16':
         datasets = load_wmt16()
+        col_to_delete = ['idx', "en"]
     elif task_name == 'multi30k':
         datasets = load_multi30k()
+        col_to_delete = ['idx', "text"]
     elif task_name == 'clinc150':
         datasets = load_clinc(is_id, shot=shot)
     elif task_name == 'rostd':
