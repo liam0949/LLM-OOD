@@ -205,7 +205,11 @@ if __name__ == '__main__':
 
 
     # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
-
+    # outputs.hidden_states[-1]
+    # to
+    # match
+    # outputs.last_hidden_states
+    # exactly
     ##test acc
     test_dataloader = DataLoader(test_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
@@ -217,7 +221,10 @@ if __name__ == '__main__':
             outputs = model(**batch)
         logits = outputs.logits
         hs = outputs.hidden_states
-        print(hs.shape)
+        print(len(hs))
+        print(hs[0].shape)
+        print(hs[1].shape)
+        print(hs[-1].shape)
         break
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=batch["labels"])
