@@ -38,13 +38,14 @@ def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
 
     in_scores = compute_ood(test_dataset, model, class_var, class_mean, norm_bank, all_classes)
     # print("in_scores",len(in_scores))
-
+    del test_dataset, dev_dataloader
     for tag, ood_features in benchmarks:
         dataloader = DataLoader(ood_features, batch_size=64, collate_fn=data_collator)
         out_scores = compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes)
         results = evaluate_ood(in_scores, out_scores)
         # print("ood result", results)
         res.append(results)
+        del dataloader
         # wandb.log(results, step=num_steps)
     res = merge_keys(res, keys)
     return res
