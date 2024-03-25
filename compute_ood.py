@@ -86,8 +86,9 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
     # dataloader = DataLoader(dev_dataset, batch_size=128, collate_fn=data_collator)
     for batch in dataloader:
         batch = {key: value.cuda() for key, value in batch.items()}
-        # labels = batch['labels']
         input_ids = batch['input_ids']
+        batch['labels'] = torch.zeros_like(input_ids.shape[0])
+
         with torch.no_grad():
             outputs = model(**batch)
             logits = outputs.get("logits")
@@ -125,10 +126,10 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
         energy_score = torch.logsumexp(logits, dim=-1)
 
         ood_keys = {
-            'softmax': softmax_score.cpu().tolist(),
-            'maha': maha_score.cpu().tolist(),
-            'cosine': cosine_score.cpu().tolist(),
-            'energy': energy_score.cpu().tolist(),
+            'softmax': softmax_score.tolist(),
+            'maha': maha_score.tolist(),
+            'cosine': cosine_score.tolist(),
+            'energy': energy_score.tolist(),
         }
         in_scores.append(ood_keys)
     return in_scores
