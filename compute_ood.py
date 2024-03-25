@@ -84,11 +84,12 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
     for batch in dataloader:
         batch = {key: value.cuda() for key, value in batch.items()}
         # labels = batch['labels']
-        input_ids = batch['input_ids']
         with torch.no_grad():
             outputs = model(**batch)
             logits = outputs.get("logits")
             pooled = outputs.get("hidden_states")[-1]
+            input_ids = batch['input_ids']
+
             if input_ids is not None:
                 batch_size = input_ids.shape[0]
                 # if no pad token found, use modulo instead of reverse indexing for ONNX compatibility
@@ -156,7 +157,7 @@ def prepare_ood(model, dataloader=None):
         input_ids = batch['input_ids']
         with torch.no_grad():
             outputs = model(**batch)
-            logits = outputs.get("logits")
+            # logits = outputs.get("logits")
             pooled = outputs.get("hidden_states")[-1]
 
             if input_ids is not None:
@@ -241,16 +242,16 @@ if __name__ == '__main__':
     # print("",len(test_dataloader))
     eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     metric = evaluate.load("accuracy")
-    model.eval()
-    for batch in test_dataloader:
-        batch = {k: v.cuda() for k, v in batch.items()}
-        with torch.no_grad():
-            outputs = model(**batch)
-        logits = outputs.logits
-        # hs = outputs.hidden_states  # 33 128, 66, 4096
-        predictions = torch.argmax(logits, dim=-1)
-        metric.add_batch(predictions=predictions, references=batch["labels"])
-    print("test acc:", metric.compute())
-    res = detect_ood(model, eval_dataloader, test_dataset, benchmarks, data_collator)
+    # model.eval()
+    # for batch in test_dataloader:
+    #     batch = {k: v.cuda() for k, v in batch.items()}
+    #     with torch.no_grad():
+    #         outputs = model(**batch)
+    #     logits = outputs.logits
+    #     # hs = outputs.hidden_states  # 33 128, 66, 4096
+    #     predictions = torch.argmax(logits, dim=-1)
+    #     metric.add_batch(predictions=predictions, references=batch["labels"])
+    # print("test acc:", metric.compute())
+    res = detect_ood(model, eval_dataloader, test_dataloader, benchmarks, data_collator)
     print(res)
     ## comput OOD
