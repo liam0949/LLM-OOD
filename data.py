@@ -61,7 +61,7 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     def preprocess_function(examples):
         inputs = (
             (examples[sentence1_key],) if sentence2_key is None else (
-                [data[sentence1_key] + " " + data[sentence2_key] for data in examples],)
+                [examples[sentence1_key][i] + " " + examples[sentence2_key][i] for i in len(examples[sentence2_key])]),)
         )
         result = tokenizer(*inputs, max_length=max_seq_length, truncation=True)
         # result["labels"] = examples["label"] if 'label' in examples else 0
@@ -190,7 +190,7 @@ def load_20ng(shot, is_id):
     test_dataset = []
     for i, subset in enumerate(all_subsets):
         dataset = load_dataset('newsgroup', subset)['train']
-        examples = [{'text': d['text'], 'label': i,"idx": d["idx"] } for d in dataset]
+        examples = [{'text': d['text'], 'label': i, "idx": d["idx"]} for d in dataset]
         random.shuffle(examples)
         num_train = int(0.8 * len(examples))
         num_dev = int(0.1 * len(examples))
@@ -231,7 +231,8 @@ def load_imdb(shot, is_id):
     idxs = list(range(len(train_dataset)))
     random.shuffle(idxs)
     num_reserve = int(len(train_dataset) * 0.1)
-    dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label'], "idx": i} for i in idxs[-num_reserve:]]
+    dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label'], "idx": i} for i in
+                   idxs[-num_reserve:]]
     train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label'], "idx": i} for i in
                      idxs[:-num_reserve]]
     test_dataset = datasets['test']

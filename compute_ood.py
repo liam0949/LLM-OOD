@@ -208,6 +208,7 @@ if __name__ == '__main__':
 
     ##test acc
     test_dataloader = DataLoader(text_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
+    eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     metric = evaluate.load("accuracy")
     model.eval()
     for batch in eval_dataloader:
