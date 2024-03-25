@@ -61,7 +61,8 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     def preprocess_function(examples):
         inputs = (
             (examples[sentence1_key],) if sentence2_key is None else (
-                [examples[sentence1_key][i] + " " + examples[sentence2_key][i] for i in range(len(examples[sentence2_key]))],)
+                [examples[sentence1_key][i] + " " + examples[sentence2_key][i] for i in
+                 range(len(examples[sentence2_key]))],)
         )
         result = tokenizer(*inputs, max_length=max_seq_length, truncation=True)
         # result["labels"] = examples["label"] if 'label' in examples else 0
@@ -194,8 +195,9 @@ def load_20ng(shot, is_id):
         random.shuffle(examples)
         num_train = int(0.8 * len(examples))
         num_dev = int(0.1 * len(examples))
-        train_dataset += examples[:num_train]
-        dev_dataset += examples[num_train: num_train + num_dev]
+        if is_id:
+            train_dataset += examples[:num_train]
+            dev_dataset += examples[num_train: num_train + num_dev]
         test_dataset += examples[num_train + num_dev:]
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "20ng")
@@ -207,15 +209,20 @@ def load_20ng(shot, is_id):
 
 def load_trec(shot, is_id):
     datasets = load_dataset('trec')
-    train_dataset = datasets['train']
+    train_dataset = []
+    dev_dataset = []
+    if is_id:
+        train_dataset = datasets['train']
+
+        idxs = list(range(len(train_dataset)))
+        random.shuffle(idxs)
+        num_reserve = int(len(train_dataset) * 0.1)
+        dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['coarse_label'], "idx": i} for i in
+                       idxs[-num_reserve:]]
+        train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['coarse_label'], "idx": i} for i
+                         in
+                         idxs[:-num_reserve]]
     test_dataset = datasets['test']
-    idxs = list(range(len(train_dataset)))
-    random.shuffle(idxs)
-    num_reserve = int(len(train_dataset) * 0.1)
-    dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['coarse_label'], "idx": i} for i in
-                   idxs[-num_reserve:]]
-    train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['coarse_label'], "idx": i} for i in
-                     idxs[:-num_reserve]]
     test_dataset = [{'text': d['text'], 'label': d['coarse_label'], "idx": d["idx"]} for d in test_dataset]
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "trec")
@@ -227,14 +234,17 @@ def load_trec(shot, is_id):
 
 def load_imdb(shot, is_id):
     datasets = load_dataset('imdb')
-    train_dataset = datasets['train']
-    idxs = list(range(len(train_dataset)))
-    random.shuffle(idxs)
-    num_reserve = int(len(train_dataset) * 0.1)
-    dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label'], "idx": i} for i in
-                   idxs[-num_reserve:]]
-    train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label'], "idx": i} for i in
-                     idxs[:-num_reserve]]
+    train_dataset = []
+    dev_dataset = []
+    if is_id:
+        train_dataset = datasets['train']
+        idxs = list(range(len(train_dataset)))
+        random.shuffle(idxs)
+        num_reserve = int(len(train_dataset) * 0.1)
+        dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label'], "idx": i} for i in
+                       idxs[-num_reserve:]]
+        train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label'], "idx": i} for i in
+                         idxs[:-num_reserve]]
     test_dataset = datasets['test']
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "imdb")
@@ -246,7 +256,7 @@ def load_imdb(shot, is_id):
 
 def load_wmt16():
     datasets = load_dataset('wmt16', 'de-en')
-    test_dataset = [{"en": d['translation']["en"], "idx": idx}  for idx, d in enumerate(datasets['test'])]
+    test_dataset = [{"en": d['translation']["en"], "idx": idx} for idx, d in enumerate(datasets['test'])]
     datasets = {'test': Dataset.from_list(test_dataset)}
     return datasets
 
@@ -282,11 +292,14 @@ def load_sst2(shot, is_id):
                 id += 1
         return examples
 
-    datasets = load_dataset('glue', 'sst2')
-    train_dataset = datasets['train']
-    # print(type(datasets['train']))
-    # train_dataset.to_pandas().info()
-    dev_dataset = datasets['validation']
+    train_dataset = []
+    dev_dataset = []
+    if is_id:
+        datasets = load_dataset('glue', 'sst2')
+        train_dataset = datasets['train']
+        # print(type(datasets['train']))
+        # train_dataset.to_pandas().info()
+        dev_dataset = datasets['validation']
     test_dataset = process('./data/sst2/test.data')
     # if is_id:
     #     train_dataset = select_few_shot(shot, train_dataset, "sst2")
