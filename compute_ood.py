@@ -125,10 +125,10 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
         energy_score = torch.logsumexp(logits, dim=-1)
 
         ood_keys = {
-            'softmax': softmax_score.tolist(),
-            'maha': maha_score.tolist(),
-            'cosine': cosine_score.tolist(),
-            'energy': energy_score.tolist(),
+            'softmax': softmax_score.cpu().tolist(),
+            'maha': maha_score.cpu().tolist(),
+            'cosine': cosine_score.cpu().tolist(),
+            'energy': energy_score.cpu().tolist(),
         }
         in_scores.append(ood_keys)
     return in_scores
