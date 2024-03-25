@@ -205,7 +205,7 @@ if __name__ == '__main__':
         learning_rate=args.learning_rate,
         lr_scheduler_type="linear",
         warmup_ratio=0.1,
-        max_grad_norm=0.3,
+        # max_grad_norm=0.3,
         per_device_train_batch_size=args.batch_size,
         per_device_eval_batch_size=args.val_batch_size,
         num_train_epochs=args.num_train_epochs,
