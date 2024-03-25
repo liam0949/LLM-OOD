@@ -15,6 +15,7 @@ from utils import find_subdir_with_smallest_number
 from config import parse_args
 import evaluate
 
+CUDA_LAUNCH_BLOCKING=1
 
 def merge_keys(l, keys):
     new_dict = {}
@@ -36,7 +37,7 @@ def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
     keys = ["auroc_IN", "fpr95_IN", "aupr_IN"]
 
     in_scores = compute_ood(test_dataset, model, class_var, class_mean, norm_bank, all_classes)
-    print("in_scores",len(in_scores))
+    # print("in_scores",len(in_scores))
 
     for tag, ood_features in benchmarks:
         dataloader = DataLoader(ood_features, batch_size=128, collate_fn=data_collator)
@@ -102,7 +103,7 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
                 sequence_lengths = -1
 
             # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
-            pooled = pooled[torch.arange(batch_size,device=pooled.device ), sequence_lengths]
+            pooled = pooled[torch.arange(batch_size,device=pooled.device), sequence_lengths]
 
 
         ood_keys = None
