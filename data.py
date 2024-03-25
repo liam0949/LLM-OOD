@@ -61,7 +61,7 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     def preprocess_function(examples):
         inputs = (
             (examples[sentence1_key],) if sentence2_key is None else (
-                examples[sentence1_key] + " " + examples[sentence2_key],)
+                [data[sentence1_key] + " " + data[sentence2_key] for data in examples],)
         )
         result = tokenizer(*inputs, max_length=max_seq_length, truncation=True)
         # result["labels"] = examples["label"] if 'label' in examples else 0
