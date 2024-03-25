@@ -41,7 +41,7 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
         col_to_delete = ['idx', 'text']
     elif task_name == 'trec':
         datasets = load_trec(shot, is_id)
-        col_to_delete = ['idx', 'text']
+        col_to_delete = ['text']
     elif task_name == 'imdb':
         datasets = load_imdb(shot, is_id)
         col_to_delete = ['idx', 'text']
