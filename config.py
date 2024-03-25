@@ -15,8 +15,8 @@ def parse_args(script):
     parser.add_argument("--max_seq_length", default=512, type=int)
     parser.add_argument("--task_name", default="sst2", type=str)
 
-    parser.add_argument("--batch_size", default=64, type=int)
-    parser.add_argument("--val_batch_size", default=128, type=int)
+    # parser.add_argument("--batch_size", default=64, type=int)
+    # parser.add_argument("--val_batch_size", default=128, type=int)
     parser.add_argument("--learning_rate", default=1e-4, type=float)
     parser.add_argument("--learning_rate_vae", default=1e-3, type=float)
     parser.add_argument("--adam_epsilon", default=1e-8, type=float)
