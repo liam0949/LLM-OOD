@@ -247,9 +247,7 @@ if __name__ == '__main__':
         with torch.no_grad():
             outputs = model(**batch)
         logits = outputs.logits
-        hs = outputs.hidden_states  # 33 128, 66, 4096
-        print(logits.shape)
-        break
+        # hs = outputs.hidden_states  # 33 128, 66, 4096
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=batch["labels"])
     print("test acc:", metric.compute())
