@@ -203,7 +203,7 @@ if __name__ == '__main__':
     dev_dataset.to_pandas().info()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
-    eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, data_collator= data_collator)
+    eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn= data_collator)
     metric = evaluate.load("accuracy")
     model.eval()
     for batch in eval_dataloader:
