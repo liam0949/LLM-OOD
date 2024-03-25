@@ -22,6 +22,7 @@ def merge_keys(l, keys):
         new_dict[key] = []
         for i in l:
             new_dict[key].append(i[key])
+        print(new_dict)
         new_dict[key] = np.mean(np.array(new_dict[key]))
     return new_dict
 
@@ -167,7 +168,7 @@ def prepare_ood(model, dataloader=None):
 
             pooled = pooled[torch.arange(batch_size), sequence_lengths]
             # pooled = pooled[:, sequence_lengths]
-            print("poled:", pooled.shape)
+            # print("poled:", pooled.shape)
 
             if bank is None:
                 bank = pooled.clone().detach()
