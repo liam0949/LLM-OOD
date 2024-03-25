@@ -1,5 +1,5 @@
 from peft import AutoPeftModelForSequenceClassification
-from transformers import AutoTokenizer,DataCollatorWithPadding
+from transformers import AutoTokenizer, DataCollatorWithPadding
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -16,7 +16,6 @@ from config import parse_args
 import evaluate
 
 
-
 def merge_keys(l, keys):
     new_dict = {}
     for key in keys:
@@ -25,10 +24,12 @@ def merge_keys(l, keys):
             new_dict[key].append(i[key])
         new_dict[key] = np.mean(np.array(new_dict[key]))
     return new_dict
+
+
 # outputs["auroc_IN"] = auroc_in
 # outputs["fpr95_IN"] = fpr_95_in
 # outputs["aupr_IN"] = aupr_in
-def detect_ood(model,dev_dataloader, test_dataset):
+def detect_ood(model, dev_dataloader, test_dataset):
     class_var, class_mean, norm_bank, all_classes = prepare_ood(dev_dataloader)
     res = []
     keys = ["auroc_IN", "fpr95_IN", "aupr_IN"]
@@ -71,6 +72,7 @@ def save_results(args, test_results):
 
     print('test_results')
     print(data_diagram)
+
 
 def compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes):
     model.eval()
@@ -164,9 +166,10 @@ def prepare_ood(model, dataloader=None):
     class_var = torch.from_numpy(precision).float().cuda()
     return class_var, class_mean, norm_bank, all_classes
 
+
 if __name__ == '__main__':
     args = parse_args("test")
-    out_dir = os.path.join(args.save_results_path, args.task_name, str(args.seed),str(args.ib))
+    out_dir = os.path.join(args.save_results_path, args.task_name, str(args.seed), str(args.ib))
     print(out_dir)
     out_dir = find_subdir_with_smallest_number(out_dir)
     print(out_dir)
@@ -175,39 +178,36 @@ if __name__ == '__main__':
     model = AutoPeftModelForSequenceClassification.from_pretrained(out_dir)
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
     model = model.to("cuda")
-    model.config.output_hidden_states =True
+    model.config.output_hidden_states = True
     # print(model.config.output_hidden_states)
-
-
-
-    ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
-
-    benchmarks = ()
-
-    # if args.task_name in ["sst2", "imdb"]:
-    #     ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
-    # else:
-    #     ood_datasets = list(set(ood_datasets) - set([args.task_name]))
-
-    _, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
-                                                    is_id=True)
-    dev_dataset.to_pandas().info()
-    # test_dataset.to_pandas().info()
-
-    # for dataset in ood_datasets:
-    #     _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
-    #     benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
-    #     ood_dataset.to_pandas().info()
-
-
-    dev_dataset.to_pandas().info()
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     tokenizer.pad_token_id = tokenizer.eos_token_id
     model.config.pad_token_id = model.config.eos_token_id
     tokenizer.pad_token = tokenizer.eos_token
+
+    _, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
+                                        is_id=True)
+    # dev_dataset.to_pandas().info()
+    # test_dataset.to_pandas().info()
+    ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
+
+    benchmarks = ()
+
+    if args.task_name in ["sst2", "imdb"]:
+        ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
+    else:
+        ood_datasets = list(set(ood_datasets) - set([args.task_name]))
+    for dataset in ood_datasets:
+        _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
+        benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
+        ood_dataset.to_pandas().info()
+
+
     # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
-    eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn= data_collator)
+
+    ##test acc
+    test_dataloader = DataLoader(text_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     metric = evaluate.load("accuracy")
     model.eval()
     for batch in eval_dataloader:
@@ -218,8 +218,4 @@ if __name__ == '__main__':
         logits = outputs.logits
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=batch["labels"])
-    print("eval acc:", metric.compute())
-
-
-
-
+    print("test acc:", metric.compute())

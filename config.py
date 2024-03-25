@@ -49,7 +49,7 @@ def parse_args(script):
         parser.add_argument("--val_batch_size", default=128, type=int)
     elif script == 'test':
         # parser.add_argument("--batch_size", default=64, type=int)
-        parser.add_argument("--val_batch_size", default=256, type=int)
+        parser.add_argument("--val_batch_size", default=128, type=int)
         # parser.add_argument('--adaptation', action='store_true', help='further adaptation in test time or not')
     else:
         raise ValueError('Unknown script')
