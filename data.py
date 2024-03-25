@@ -211,7 +211,7 @@ def load_trec(shot, is_id):
     num_reserve = int(len(train_dataset) * 0.1)
     dev_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label-coarse'], "idx": i} for i in
                    idxs[-num_reserve:]]
-    train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label-coarse']. "idx": i} for i in
+    train_dataset = [{'text': train_dataset[i]['text'], 'label': train_dataset[i]['label-coarse'], "idx": i} for i in
                      idxs[:-num_reserve]]
     test_dataset = [{'text': d['text'], 'label': d['label-coarse'], "idx": d["idx"]} for d in test_dataset]
     # if is_id:
