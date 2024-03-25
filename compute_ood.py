@@ -215,7 +215,7 @@ if __name__ == '__main__':
     # dev_dataset.to_pandas().info()
     # test_dataset.to_pandas().info()
     # ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
-    ood_datasets = ['rte', 'sst2', 'mnli', ]
+    ood_datasets = ['rte', 'sst2', ]
 
     benchmarks = ()
 
