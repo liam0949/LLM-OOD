@@ -246,7 +246,7 @@ def load_imdb(shot, is_id):
 
 def load_wmt16():
     datasets = load_dataset('wmt16', 'de-en')
-    test_dataset = [d['translation'] for d in datasets['test']]
+    test_dataset = [{"en": d['translation']["en"], "idx": idx}  for idx, d in enumerate(datasets['test'])]
     datasets = {'test': Dataset.from_list(test_dataset)}
     return datasets
 
