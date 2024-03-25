@@ -29,7 +29,7 @@ def merge_keys(l, keys):
 # outputs["auroc_IN"] = auroc_in
 # outputs["fpr95_IN"] = fpr_95_in
 # outputs["aupr_IN"] = aupr_in
-def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator ):
+def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
     class_var, class_mean, norm_bank, all_classes = prepare_ood(dev_dataloader)
     res = []
     keys = ["auroc_IN", "fpr95_IN", "aupr_IN"]
@@ -77,19 +77,14 @@ def save_results(args, test_results):
 def compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes):
     model.eval()
     in_scores = []
-    # for batch in dataloader:
-    #     model.eval()
-    #     batch = {key: value.to(args.device) for key, value in batch.items()}
-    #     with torch.no_grad():
-    #         ood_keys = model.compute_ood(**batch)
-    #         in_scores.append(ood_keys)
+
     for batch in dataloader:
         batch = {key: value.cuda() for key, value in batch.items()}
         labels = batch['labels']
         with torch.no_grad():
             outputs = model(**batch)
             logits = outputs.get("logits")
-            pooled = outputs.get("hidden_states")[-1]
+            pooled = outputs.get("hidden_states")[-1].mean(dim=1)
 
         ood_keys = None
         softmax_score = F.softmax(logits, dim=-1).max(-1)[0]
@@ -220,15 +215,12 @@ if __name__ == '__main__':
         with torch.no_grad():
             outputs = model(**batch)
         logits = outputs.logits
-        hs = outputs.hidden_states
-        print(len(hs))
-        print(hs[0].shape)
-        print(hs[1].shape)
-        print(hs[-1].shape)
+        hs = outputs.hidden_states # 33 128, 66, 4096
+        print(logits.shape)
         break
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=batch["labels"])
     print("test acc:", metric.compute())
-    detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator )
+    detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator)
     ## comput OOD
 
