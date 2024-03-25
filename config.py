@@ -4,12 +4,15 @@ import glob
 import argparse
 
 
-
+# dir = "/home/liming/projects/llama/hf_models/llama-2-7b-hf"
+dir = "/home/bossjobai/LLM_Projects/llama/llama-2-7b-hf"
+# save_dir = '/home/liming/model_cps/LLM-OOD'
+save_dir = '/home/bossjobai/model_cps/LLM-OOD'
 
 def parse_args(script):
     parser = argparse.ArgumentParser(description='LLM OOD script %s' % (script))
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_name_or_path", default="/home/liming/projects/llama/hf_models/llama-2-7b-hf", type=str,
+    parser.add_argument("--model_name_or_path", default=dir, type=str,
                         # parser.add_argument("--model_name_or_path", default="distilbert/distilbert-base-uncased", type=str,
                         help="roberta-large;bert-base-uncased")
     parser.add_argument("--max_seq_length", default=512, type=int)
@@ -27,7 +30,7 @@ def parse_args(script):
     parser.add_argument("--project_name", type=str, default="coling2024_ood")
     parser.add_argument("--shot", type=int, default=100)
     parser.add_argument("--freeze", action='store_true', help="freeze the model")
-    parser.add_argument("--save_results_path", type=str, default='/home/liming/model_cps/LLM-OOD',
+    parser.add_argument("--save_results_path", type=str, default=save_dir,
                         help="the path to save results")
 
     parser.add_argument("--ib", action="store_true", help="If specified, uses the information bottleneck to reduce\
