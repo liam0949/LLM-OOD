@@ -214,8 +214,8 @@ if __name__ == '__main__':
 
     _, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
                                         is_id=True)
-    # dev_dataset.to_pandas().info()
-    # test_dataset.to_pandas().info()
+    dev_dataset.to_pandas().info()
+    test_dataset.to_pandas().info()
     # ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
     ood_datasets = ['rte', 'sst2', ]
 
@@ -238,6 +238,7 @@ if __name__ == '__main__':
     # exactly
     ##test acc
     test_dataloader = DataLoader(test_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
+    # print("",len(test_dataloader))
     eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     metric = evaluate.load("accuracy")
     model.eval()
