@@ -74,7 +74,7 @@ def load(task_name, tokenizer, shot=1000000000, max_seq_length=256, is_id=False)
     dev_dataset = datasets["validation"].map(preprocess_function, batched=True,
                                              remove_columns=col_to_delete) if 'validation' in datasets and is_id else None
     test_dataset = datasets["test"].map(preprocess_function, batched=True,
-                                        remove_columns="sentence") if 'test' in datasets else None
+                                        remove_columns=col_to_delete) if 'test' in datasets else None
     import pandas as pd
 
     # train_dataset = list(map(preprocess_function, datasets['train'])) if 'train' in datasets and is_id else None

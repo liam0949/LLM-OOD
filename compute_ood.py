@@ -219,3 +219,6 @@ if __name__ == '__main__':
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=batch["labels"])
     print("test acc:", metric.compute())
+    detect_ood()
+    ## comput OOD
+
