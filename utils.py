@@ -74,7 +74,7 @@ import os
 
 def find_subdir_with_smallest_number(base_dir):
     subdirs = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
-    filtered_subdirs = [d for d in subdirs if d.startswith("checkpoints-")]
+    filtered_subdirs = [d for d in subdirs if d.startswith("checkpoint-")]
 
     if not filtered_subdirs:
         return None  # No sub directories found
