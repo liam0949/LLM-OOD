@@ -211,14 +211,17 @@ if __name__ == '__main__':
 
     model = AutoPeftModelForSequenceClassification.from_pretrained(out_dir)
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side="right"
     model = model.to("cuda")
+    model.config.pad_token_id = model.config.eos_token_id
     model.config.output_hidden_states = True
+
     # print(model.config.output_hidden_states)
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-    tokenizer.pad_token_id = tokenizer.eos_token_id
-    model.config.pad_token_id = model.config.eos_token_id
-    tokenizer.pad_token = tokenizer.eos_token
+
 
     print(tokenizer.padding_side)
 
@@ -251,6 +254,7 @@ if __name__ == '__main__':
     # print("",len(test_dataloader))
     # eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     metric = evaluate.load("accuracy")
+
     model.eval()
     for batch in test_dataloader:
         batch = {k: v.cuda() for k, v in batch.items()}

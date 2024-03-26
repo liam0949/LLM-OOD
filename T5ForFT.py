@@ -152,7 +152,7 @@ if __name__ == '__main__':
     # wan_config.task_name = args.task_name
 
     ##load model
-    tokenizer = LlamaTokenizer.from_pretrained(args.model_name_or_path, add_prefix_space=True)
+    tokenizer = LlamaTokenizer.from_pretrained(args.model_name_or_path)
     num_labels = task_to_labels[args.task_name]
     tokenizer.pad_token_id = tokenizer.eos_token_id
     tokenizer.pad_token = tokenizer.eos_token
