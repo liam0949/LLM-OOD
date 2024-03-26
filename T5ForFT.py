@@ -214,7 +214,7 @@ if __name__ == '__main__':
         gradient_accumulation_steps=2,
         eval_accumulation_steps=2,
         weight_decay=0.01,
-        # evaluation_strategy="epoch",
+        evaluation_strategy="steps",
         eval_steps=500,
         logging_steps=500,
         # save_strategy = "epoch",
