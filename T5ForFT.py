@@ -220,8 +220,8 @@ if __name__ == '__main__':
         # save_strategy = "epoch",
         save_steps=500,
         load_best_model_at_end=True,
-        metric_for_best_model="accuracy",
-        greater_is_better=True,
+        # metric_for_best_model="accuracy",
+        # greater_is_better=True,
         save_total_limit=2,
         report_to="wandb",
         bf16=True
