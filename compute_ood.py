@@ -220,45 +220,47 @@ if __name__ == '__main__':
     model.config.pad_token_id = model.config.eos_token_id
     tokenizer.pad_token = tokenizer.eos_token
 
-    _, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
-                                        is_id=True)
-    dev_dataset.to_pandas().info()
-    test_dataset.to_pandas().info()
-    # ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
-    ood_datasets = ['rte', 'sst2', ]
+    print(tokenizer.padding_side)
 
-    benchmarks = ()
-
-    if args.task_name in ["sst2", "imdb"]:
-        ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
-    else:
-        ood_datasets = list(set(ood_datasets) - set([args.task_name]))
-    for dataset in ood_datasets:
-        _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
-        benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
-        ood_dataset.to_pandas().info()
-
-    # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
-    # outputs.hidden_states[-1]
-    # to
-    # match
-    # outputs.last_hidden_states
-    # exactly
-    ##test acc
-    test_dataloader = DataLoader(test_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
-    # print("",len(test_dataloader))
-    eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
-    metric = evaluate.load("accuracy")
-    # model.eval()
-    # for batch in test_dataloader:
-    #     batch = {k: v.cuda() for k, v in batch.items()}
-    #     with torch.no_grad():
-    #         outputs = model(**batch)
-    #     logits = outputs.logits
-    #     # hs = outputs.hidden_states  # 33 128, 66, 4096
-    #     predictions = torch.argmax(logits, dim=-1)
-    #     metric.add_batch(predictions=predictions, references=batch["labels"])
-    # print("test acc:", metric.compute())
-    res = detect_ood(model, eval_dataloader, test_dataloader, benchmarks, data_collator)
-    print(res)
+    # _, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
+    #                                     is_id=True)
+    # dev_dataset.to_pandas().info()
+    # test_dataset.to_pandas().info()
+    # # ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
+    # ood_datasets = ['rte', 'sst2', ]
+    #
+    # benchmarks = ()
+    #
+    # if args.task_name in ["sst2", "imdb"]:
+    #     ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
+    # else:
+    #     ood_datasets = list(set(ood_datasets) - set([args.task_name]))
+    # for dataset in ood_datasets:
+    #     _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
+    #     benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
+    #     ood_dataset.to_pandas().info()
+    #
+    # # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
+    # # outputs.hidden_states[-1]
+    # # to
+    # # match
+    # # outputs.last_hidden_states
+    # # exactly
+    # ##test acc
+    # test_dataloader = DataLoader(test_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
+    # # print("",len(test_dataloader))
+    # eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
+    # metric = evaluate.load("accuracy")
+    # # model.eval()
+    # # for batch in test_dataloader:
+    # #     batch = {k: v.cuda() for k, v in batch.items()}
+    # #     with torch.no_grad():
+    # #         outputs = model(**batch)
+    # #     logits = outputs.logits
+    # #     # hs = outputs.hidden_states  # 33 128, 66, 4096
+    # #     predictions = torch.argmax(logits, dim=-1)
+    # #     metric.add_batch(predictions=predictions, references=batch["labels"])
+    # # print("test acc:", metric.compute())
+    # res = detect_ood(model, eval_dataloader, test_dataloader, benchmarks, data_collator)
+    # print(res)
     ## comput OOD
