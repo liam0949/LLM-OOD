@@ -214,11 +214,11 @@ if __name__ == '__main__':
         gradient_accumulation_steps=2,
         eval_accumulation_steps=2,
         weight_decay=0.01,
-        evaluation_strategy="epoch",
-        # eval_steps=300,
-        # logging_steps=300,
-        save_strategy = "epoch",
-        # save_steps=300,
+        # evaluation_strategy="epoch",
+        eval_steps=500,
+        logging_steps=500,
+        # save_strategy = "epoch",
+        save_steps=500,
         load_best_model_at_end=True,
         metric_for_best_model="accuracy",
         greater_is_better=True,
@@ -235,8 +235,8 @@ if __name__ == '__main__':
         eval_dataset=dev_dataset,
         # test_dataset=test_dataset,
         data_collator=data_collator,
-        compute_metrics=compute_metrics,
-        callbacks = [EarlyStoppingCallback(early_stopping_patience=5)]
+        compute_metrics=compute_metrics
+        # callbacks = [EarlyStoppingCallback(early_stopping_patience=5)]
     )
 
     # llm.config.use_cache = False
