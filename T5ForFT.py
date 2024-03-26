@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer, AutoTokenizer, AutoConfig, \
     LlamaTokenizer, LlamaForSequenceClassification
 from transformers import BitsAndBytesConfig
+from transformers import EarlyStoppingCallback, IntervalStrategy
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from utils import set_seed, collate_fn, AverageMeter, accuracy
 from datasets import load_metric
@@ -26,14 +27,14 @@ warnings.filterwarnings("ignore")
 from peft import get_peft_model, LoraConfig, TaskType
 
 peft_config = LoraConfig(
-    task_type=TaskType.SEQ_CLS, r=16, lora_alpha=32, lora_dropout=0.05, bias="none",
+    task_type=TaskType.SEQ_CLS, r=16, lora_alpha=16, lora_dropout=0.05, bias="none",
     target_modules=[
         "q_proj",
         "v_proj",
         "k_proj",
         "o_proj",
 
-    ],
+    ]
 )
 
 torch.backends.cuda.matmul.allow_tf32 = True
@@ -212,13 +213,15 @@ if __name__ == '__main__':
         num_train_epochs=args.num_train_epochs,
         gradient_accumulation_steps=2,
         eval_accumulation_steps=2,
-        weight_decay=0.001,
-        evaluation_strategy="steps",
-        eval_steps=500,
-        logging_steps=500,
-        save_strategy = "steps",
-        save_steps=500,
+        weight_decay=0.01,
+        evaluation_strategy="epoch",
+        # eval_steps=300,
+        # logging_steps=300,
+        save_strategy = "epoch",
+        # save_steps=300,
         load_best_model_at_end=True,
+        metric_for_best_model="accuracy",
+        greater_is_better=True,
         save_total_limit=2,
         report_to="wandb",
         bf16=True
@@ -232,13 +235,16 @@ if __name__ == '__main__':
         eval_dataset=dev_dataset,
         # test_dataset=test_dataset,
         data_collator=data_collator,
-        compute_metrics=compute_metrics
+        compute_metrics=compute_metrics,
+        callbacks = [EarlyStoppingCallback(early_stopping_patience=5)]
     )
 
     # llm.config.use_cache = False
 
     # do_train = True
-
+    print("vanilla performance...")
+    test_acc = llama_trainer.evaluate(test_dataset)
+    wandb.log({"test_acc": test_acc})
     # Launch training and log metrics
     print("Training...")
     llama_trainer.train()
