@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer, AutoTokenizer, AutoConfig, \
     LlamaTokenizer, LlamaForSequenceClassification
 from transformers import BitsAndBytesConfig
+from transformers import EarlyStoppingCallback, IntervalStrategy
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from utils import set_seed, collate_fn, AverageMeter, accuracy
 from datasets import load_metric
@@ -20,6 +21,7 @@ from data import load
 import random
 from datasets import load_metric
 from config import parse_args
+from models import CustomTrainer, MLP,
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -31,8 +33,9 @@ peft_config = LoraConfig(
         "q_proj",
         "v_proj",
         "k_proj",
-        "out_proj"
-    ],
+        "o_proj",
+
+    ]
 )
 
 torch.backends.cuda.matmul.allow_tf32 = True
@@ -59,53 +62,12 @@ task_to_metric = {
     # 'clincMix': 'mnli',
 }
 
-
-class ViCELossTrainer(Trainer):
-    def compute_loss(self, model, inputs, return_outputs=False):
-        labels = inputs.pop("labels")
-        # Get model's predictions
-        outputs = model(**inputs)
-        logits = outputs.get("logits")
-        # Compute custom loss
-        loss_fct = torch.nn.CrossEntropyLoss()
-        loss = loss_fct(logits.view(-1, self.model.config.num_labels), labels.view(-1))
-        return (loss, outputs) if return_outputs else loss
-
-
-# training_args = TrainingArguments(
-#     output_dir="./llama-lora-token-classification",
-#     learning_rate=lr,
-#     lr_scheduler_type="constant",
-#     warmup_ratio=0.1,
-#     max_grad_norm=0.3,
-#     per_device_train_batch_size=batch_size,
-#     per_device_eval_batch_size=batch_size,
-#     num_train_epochs=num_epochs,
-#     weight_decay=0.001,
-#     evaluation_strategy="epoch",
-#     save_strategy="epoch",
-#     load_best_model_at_end=True,
-#     # report_to="wandb",
-#     fp16=True,
-#     # gradient_checkpointing=True,
-# )
-
-
 def compute_metrics(eval_pred):
     metric_name = task_to_metric["sst2"]
     metric = evaluate.load("glue", metric_name)
 
     logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
-    # logits, labels = eval_pred  # eval_pred is the tuple of predictions and labels returned by the model
-    # print(len(logits))
-    # print(logits.shape)
-    # print(labels.shape)
-    # print(len(logits[1]))
-    # print(logits[1][0].shape)
-    # print(logits[1][1].shape)
-    # print(logits[1].shape)
-    # # print(len(logits[1]))
-    # logits = logits[0]
+
 
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
@@ -123,33 +85,20 @@ def set_seed(args):
         torch.cuda.manual_seed_all(args.seed)
 
 
-def train(args, model, train_dataset, dev_dataset, test_dataset, benchmarks):
-    pass
-
-
-class ViCELossTrainer(Trainer):
-    def compute_loss(self, model, inputs, return_outputs=False):
-        labels = inputs.pop("labels")
-        # Get model's predictions
-        outputs = model(**inputs)
-        logits = outputs.get("logits")
-        # Compute custom loss
-        loss_fct = torch.nn.CrossEntropyLoss()
-        loss = loss_fct(logits.view(-1, self.model.config.num_labels), labels.view(-1))
-        return (loss, outputs) if return_outputs else loss
 
 
 if __name__ == '__main__':
+
     args = parse_args("train")
     set_seed(args)
 
-    wandb.init(project=args.project_name, name=args.task_name + str(datetime.datetime.now()))
+    wandb.init(project=args.project_name, name=args.task_name+"VI" + str(datetime.datetime.now()))
     wan_config = wandb.config
     wan_config.learning_rate = args.learning_rate
     # wan_config.task_name = args.task_name
 
     ##load model
-    tokenizer = LlamaTokenizer.from_pretrained(args.model_name_or_path, add_prefix_space=True)
+    tokenizer = LlamaTokenizer.from_pretrained(args.model_name_or_path)
     num_labels = task_to_labels[args.task_name]
     tokenizer.pad_token_id = tokenizer.eos_token_id
     tokenizer.pad_token = tokenizer.eos_token
@@ -179,13 +128,14 @@ if __name__ == '__main__':
     # )
     model.config.output_hidden_states = True
     # model.config.keys_to_ignore_at_inference = ["hidden_states"]
-    model.config.keys_to_ignore_at_inference = ["past_key_values", "hidden_states"]
+    model.config.keys_to_ignore_at_inference = ["past_key_values","hidden_states"]
 
     # model.print_trainable_parameters()
     # model = prepare_model_for_int8_training(model)
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
     model = model.cuda()
+    mlp = MLP(model.hidden_size)
 
     # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
     # datasets = ['sst2', 'imdb', 'trec', '20ng']
@@ -198,48 +148,57 @@ if __name__ == '__main__':
     print("train size " + args.task_name, len(train_dataset))
     train_dataset.to_pandas().info()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-    out_dir = os.path.join(args.save_results_path, args.task_name, str(args.seed), str(args.ib))
+    args.ib = True
+    out_dir = os.path.join(args.save_results_path, args.task_name, str(args.seed),str(args.ib))
     training_args = TrainingArguments(
         output_dir=out_dir,
         learning_rate=args.learning_rate,
-        lr_scheduler_type="constant",
+        mlp_lr = args.mlp_lr,
+        lr_scheduler_type="linear",
         warmup_ratio=0.1,
-        max_grad_norm=0.3,
+        # max_grad_norm=0.3,
         per_device_train_batch_size=args.batch_size,
         per_device_eval_batch_size=args.val_batch_size,
         num_train_epochs=args.num_train_epochs,
         gradient_accumulation_steps=2,
         eval_accumulation_steps=2,
-        weight_decay=0.001,
+        weight_decay=0.01,
         evaluation_strategy="steps",
         eval_steps=500,
         logging_steps=500,
-        save_strategy="steps",
+        # save_strategy = "epoch",
         save_steps=500,
         load_best_model_at_end=True,
+        # metric_for_best_model="accuracy",
+        # greater_is_better=True,
         save_total_limit=2,
         report_to="wandb",
         bf16=True
         # gradient_checkpointing=True,
     )
 
-    llama_trainer = ViCELossTrainer(
-        model=model,
+    llama_trainer = CustomTrainer(
+        model_a=model,
+        model_b= mlp,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=dev_dataset,
         # test_dataset=test_dataset,
         data_collator=data_collator,
         compute_metrics=compute_metrics
+        # callbacks = [EarlyStoppingCallback(early_stopping_patience=5)]
     )
 
     # llm.config.use_cache = False
 
     # do_train = True
-
+    print("vanilla performance...")
+    test_acc = llama_trainer.evaluate(test_dataset)
+    wandb.log({"test_acc": test_acc})
     # Launch training and log metrics
     print("Training...")
     llama_trainer.train()
+
 
     print("Testing...")
     test_acc = llama_trainer.evaluate(test_dataset)

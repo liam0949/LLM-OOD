@@ -62,52 +62,13 @@ task_to_metric = {
 }
 
 
-class ViCELossTrainer(Trainer):
-    def compute_loss(self, model, inputs, return_outputs=False):
-        labels = inputs.pop("labels")
-        # Get model's predictions
-        outputs = model(**inputs)
-        logits = outputs.get("logits")
-        # Compute custom loss
-        loss_fct = torch.nn.CrossEntropyLoss()
-        loss = loss_fct(logits.view(-1, self.model.config.num_labels), labels.view(-1))
-        return (loss, outputs) if return_outputs else loss
-
-
-# training_args = TrainingArguments(
-#     output_dir="./llama-lora-token-classification",
-#     learning_rate=lr,
-#     lr_scheduler_type="constant",
-#     warmup_ratio=0.1,
-#     max_grad_norm=0.3,
-#     per_device_train_batch_size=batch_size,
-#     per_device_eval_batch_size=batch_size,
-#     num_train_epochs=num_epochs,
-#     weight_decay=0.001,
-#     evaluation_strategy="epoch",
-#     save_strategy="epoch",
-#     load_best_model_at_end=True,
-#     # report_to="wandb",
-#     fp16=True,
-#     # gradient_checkpointing=True,
-# )
-
 
 def compute_metrics(eval_pred):
     metric_name = task_to_metric["sst2"]
     metric = evaluate.load("glue", metric_name)
 
     logits, labels = eval_pred.predictions, eval_pred.label_ids  # eval_pred is the tuple of predictions and labels returned by the model
-    # logits, labels = eval_pred  # eval_pred is the tuple of predictions and labels returned by the model
-    # print(len(logits))
-    # print(logits.shape)
-    # print(labels.shape)
-    # print(len(logits[1]))
-    # print(logits[1][0].shape)
-    # print(logits[1][1].shape)
-    # print(logits[1].shape)
-    # # print(len(logits[1]))
-    # logits = logits[0]
+
 
     preds = np.argmax(logits, axis=1)
     result = metric.compute(predictions=preds, references=labels)
@@ -125,8 +86,7 @@ def set_seed(args):
         torch.cuda.manual_seed_all(args.seed)
 
 
-def train(args, model, train_dataset, dev_dataset, test_dataset, benchmarks):
-    pass
+
 
 
 class ViCELossTrainer(Trainer):

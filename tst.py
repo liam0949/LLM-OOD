@@ -49,8 +49,9 @@ ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30
 # # plt.yticks(my_y_ticks)
 # plt.show()
 # plt.savefig(""20ng.png"")
-
-a = torch.tensor([1,1,1,1,1,0,0,0])
-print(a.argmax(-1))
-a = torch.tensor([0,0,0,1,1,1,1,1])
-print(a.argmax(-1))
+import numpy as np
+# a = np.logspace(0, 32, 32, endpoint=True, base=0.9)
+# print(a)
+a = ({"name":"jack"},{"name":"jack2"},{"name":"jack"})
+b = tuple(d["name"] for d in a)
+print(b)

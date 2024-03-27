@@ -213,7 +213,7 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
     tokenizer.pad_token_id = tokenizer.eos_token_id
     tokenizer.pad_token = tokenizer.eos_token
-    tokenizer.padding_side="right"
+    # tokenizer.padding_side="right"
     model = model.to("cuda")
     model.config.pad_token_id = model.config.eos_token_id
     model.config.output_hidden_states = True
