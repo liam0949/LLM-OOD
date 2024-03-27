@@ -76,7 +76,7 @@ class CustomTrainer(Trainer):
         loss.backward()
 
         # Update each model with its optimizer
-        self.model_a_optimizer.step()
+        self.optimizer.step()
         self.model_b_optimizer.step()
 
         return loss.item()
