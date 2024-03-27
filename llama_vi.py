@@ -135,7 +135,7 @@ if __name__ == '__main__':
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
     model = model.cuda()
-    mlp = MLP(model.config.hidden_size)
+    mlp = MLP(model.config.hidden_size).cuda()
 
     # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
     # datasets = ['sst2', 'imdb', 'trec', '20ng']

@@ -130,7 +130,7 @@ class MLP(nn.Module):
         self.layers = nn.Sequential(*layers)
         self.vae_emb2mu = nn.Linear(input_size, input_size)
         self.vae_emb2logvar = nn.Linear(input_size, input_size)
-        self.vae_hidden_attention = nn.Parameter(torch.ones(24))
+        self.vae_hidden_attention = nn.Parameter(torch.ones(32))
 
     def estimate(self, emb, emb2mu, emb2logvar):
         """Estimates mu and std from the given input embeddings."""
