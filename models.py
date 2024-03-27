@@ -168,7 +168,8 @@ class MLP(nn.Module):
         tgt = layer_last * attn
         tgt = tgt.mean(dim=0)
         rec_loss_fct = MSELoss(reduction='none')
-        rec_loss = rec_loss_fct(rec_hidden, tgt).sum(dim=-1).mean()
+        # rec_loss = rec_loss_fct(rec_hidden, tgt).sum(dim=-1).mean()
+        rec_loss = rec_loss_fct(rec_hidden, tgt).mean()
 
         # print(rec_hidden.size())
         # print()
