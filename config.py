@@ -48,8 +48,8 @@ def parse_args(script):
 
     if script == 'train':
 
-        parser.add_argument("--batch_size", default=64, type=int)
-        parser.add_argument("--val_batch_size", default=128, type=int)
+        parser.add_argument("--batch_size", default=32, type=int)
+        parser.add_argument("--val_batch_size", default=64, type=int)
     elif script == 'test':
         # parser.add_argument("--batch_size", default=64, type=int)
         parser.add_argument("--val_batch_size", default=128, type=int)
