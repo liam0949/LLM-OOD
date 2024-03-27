@@ -21,7 +21,7 @@ from data import load
 import random
 from datasets import load_metric
 from config import parse_args
-from models import CustomTrainer, MLP,
+from models import CustomTrainer, MLP
 import warnings
 
 warnings.filterwarnings("ignore")
