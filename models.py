@@ -39,7 +39,7 @@ class CustomTrainer(Trainer):
 
         # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
         pooled = tuple(
-            d[torch.arange(batch_size, device=pooled.device), sequence_lengths] for d in pooled)  # 32 bsz 4096
+            d[torch.arange(batch_size), sequence_lengths] for d in pooled)  # 32 bsz 4096
         # Step 2: Extract decoder hidden states and use them as input to model_b (MLP)
         # Assuming we take the last layer's hidden states
         inputs_b = pooled  # Detach to prevent gradients flowing into LLaMA during MLP's backward pass
