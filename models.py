@@ -79,7 +79,7 @@ class CustomTrainer(Trainer):
         self.optimizer.step()
         self.model_b_optimizer.step()
 
-        return loss.item()
+        return loss.detach()/ self.args.gradient_accumulation_steps
 
 
 # from transformers import AutoModelForSequenceClassification, AdamW
