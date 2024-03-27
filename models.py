@@ -7,11 +7,11 @@ from torch.nn import CrossEntropyLoss, MSELoss
 
 
 class CustomTrainer(Trainer):
-    def __init__(self, model_a, model_b, args, mlp_lr,train_dataset, eval_dataset, tokenizer, **kwargs):
+    def __init__(self, model_a, model_b, args, mlp_lr, train_dataset, eval_dataset, **kwargs):
         # model_a is the LLaMA model
         # model_b is the MLP model
         super().__init__(model=model_a, args=args, train_dataset=train_dataset, eval_dataset=eval_dataset,
-                         tokenizer=tokenizer, **kwargs)
+                         **kwargs)
         self.model_a = model_a
         self.model_b = model_b
         # self.model_a_optimizer = model_a_optimizer
@@ -25,7 +25,6 @@ class CustomTrainer(Trainer):
         # Step 1: Forward pass through model_a (LLaMA)
         outputs_a = self.model_a(**inputs)
         llama_loss = outputs_a.loss
-
 
         pooled = outputs_a.get("hidden_states")[1:]
         input_ids = inputs["input_ids"]
@@ -118,12 +117,11 @@ class CustomTrainer(Trainer):
 ##split
 
 
-
 class MLP(nn.Module):
     def __init__(self, input_size):
         super(MLP, self).__init__()
         layers = []
-        hidden_sizes = [input_size*2,input_size*4, input_size*2]
+        hidden_sizes = [input_size * 2, input_size * 4, input_size * 2]
         all_sizes = [input_size] + hidden_sizes + [input_size]
         for i in range(len(all_sizes) - 1):
             layers.append(nn.Linear(all_sizes[i], all_sizes[i + 1]))
@@ -133,6 +131,7 @@ class MLP(nn.Module):
         self.vae_emb2mu = nn.Linear(input_size, input_size)
         self.vae_emb2logvar = nn.Linear(input_size, input_size)
         self.vae_hidden_attention = nn.Parameter(torch.ones(24))
+
     def estimate(self, emb, emb2mu, emb2logvar):
         """Estimates mu and std from the given input embeddings."""
         mean = emb2mu(emb)
@@ -150,11 +149,11 @@ class MLP(nn.Module):
     def reparameterize(self, mu, log_var):
         batch_size = mu.shape[0]
         std = torch.exp(0.5 * log_var)
-        eps = torch.randn( batch_size, mu.shape[1]).cuda()
+        eps = torch.randn(batch_size, mu.shape[1]).cuda()
         return mu + std * eps
 
-    def forward(self, x):#(33 128, _, 4096)
-        last_hidden = x[-1] #128, 4096
+    def forward(self, x):  # (33 128, _, 4096)
+        last_hidden = x[-1]  # 128, 4096
         layer_last = torch.stack(x, dim=0)
         layer_num = len(x)
         mu, log_var = self.estimate(last_hidden, self.vae_emb2mu, self.vae_emb2logvar)
@@ -187,13 +186,11 @@ class MLP(nn.Module):
         # # loss["loss"] = ce_loss + (beta if self.kl_annealing == "linear" else self.beta) * (kl_loss + rec_loss)
         # loss["loss"] = ce_loss + self.beta * (kl_loss + rec_loss)
 
+        return rec_loss + kl_loss, attn
 
-
-        return rec_loss+kl_loss, attn
 
 from transformers import Trainer, TrainingArguments
 from transformers.modeling_outputs import SequenceClassifierOutput
-
 
 # class CustomTrainer(Trainer):
 #     def __init__(self, model, mlp_model, args, train_dataset=None, eval_dataset=None, tokenizer=None, model_init=None,
@@ -284,4 +281,3 @@ from transformers.modeling_outputs import SequenceClassifierOutput
 #     eval_dataset=eval_dataset,  # Assuming you have an eval_dataset
 #     tokenizer=tokenizer,  # Your tokenizer
 # )
-
