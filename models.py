@@ -3,7 +3,7 @@ import torch
 from torch import nn
 from torch.nn.functional import kl_div, softmax, log_softmax
 import numpy as np
-import torch.nn import CrossEntropyLoss, MSELoss
+from torch.nn import CrossEntropyLoss, MSELoss
 
 
 class CustomTrainer(Trainer):
