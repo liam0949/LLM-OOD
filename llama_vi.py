@@ -153,7 +153,6 @@ if __name__ == '__main__':
     training_args = TrainingArguments(
         output_dir=out_dir,
         learning_rate=args.learning_rate,
-        mlp_lr = args.mlp_lr,
         lr_scheduler_type="linear",
         warmup_ratio=0.1,
         # max_grad_norm=0.3,
@@ -180,6 +179,7 @@ if __name__ == '__main__':
     llama_trainer = CustomTrainer(
         model_a=model,
         model_b= mlp,
+        mlp_lr=args.mlp_lr,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=dev_dataset,

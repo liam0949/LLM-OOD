@@ -7,7 +7,7 @@ from torch.nn import CrossEntropyLoss, MSELoss
 
 
 class CustomTrainer(Trainer):
-    def __init__(self, model_a, model_b, args, train_dataset, eval_dataset, tokenizer, **kwargs):
+    def __init__(self, model_a, model_b, args, mlp_lr,train_dataset, eval_dataset, tokenizer, **kwargs):
         # model_a is the LLaMA model
         # model_b is the MLP model
         super().__init__(model=model_a, args=args, train_dataset=train_dataset, eval_dataset=eval_dataset,
@@ -16,7 +16,7 @@ class CustomTrainer(Trainer):
         self.model_b = model_b
         # self.model_a_optimizer = model_a_optimizer
 
-        self.model_b_optimizer = torch.optim.Adam(self.model_b.parameters(), lr=args.mlp_lr)  # Example
+        self.model_b_optimizer = torch.optim.Adam(self.model_b.parameters(), lr=mlp_lr)  # Example
 
     def compute_loss(self, model, inputs, return_outputs=False):
         """
