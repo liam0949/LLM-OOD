@@ -196,12 +196,14 @@ if __name__ == '__main__':
     print("vanilla performance...")
     test_acc = llama_trainer.evaluate(test_dataset)
     wandb.log({"test_acc": test_acc})
-    wandb.log({"atten": wandb.Histogram(llama_trainer.atten.cpu().numpy())})
+    wandb.log({"atten": wandb.Histogram(llama_trainer.atten.view(32,).cpu().numpy())})
+    print(llama_trainer.atten.view(32,).cpu().numpy())
 
     # Launch training and log metrics
     print("Training...")
     llama_trainer.train()
-    wandb.log({"atten": wandb.Histogram(llama_trainer.atten.cpu().numpy())})
+    wandb.log({"atten": wandb.Histogram(llama_trainer.atten.view(32,).cpu().numpy())})
+    print(llama_trainer.atten.view(32,).cpu().numpy())
 
     print("Testing...")
     test_acc = llama_trainer.evaluate(test_dataset)
