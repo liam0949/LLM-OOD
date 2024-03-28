@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 
 class CustomTrainer(Trainer):
-    def __init__(self, model_a, model_b, args, mlp_lr, train_dataset, eval_dataset, **kwargs):
+    def __init__(self, model_a, model_b, args, mlp_lr, train_dataset, eval_dataset,wandb, **kwargs):
         # model_a is the LLaMA model
         # model_b is the MLP model
         super().__init__(model=model_a, args=args, train_dataset=train_dataset, eval_dataset=eval_dataset,
@@ -18,6 +18,7 @@ class CustomTrainer(Trainer):
         # self.model_a_optimizer = model_a_optimizer
 
         self.model_b_optimizer = torch.optim.Adam(self.model_b.parameters(), lr=mlp_lr)  # Example
+        self.atten = None
 
     def compute_loss(self, model, inputs, return_outputs=False):
         """
@@ -45,7 +46,8 @@ class CustomTrainer(Trainer):
         # Assuming we take the last layer's hidden states
         inputs_b = pooled  # Detach to prevent gradients flowing into LLaMA during MLP's backward pass
         kl_loss, atten = self.model_b(inputs_b)
-        self.wandb({"atten": atten.detach()}, self.global_step)
+        self.atten = atten
+        # wandb({"atten": atten.detach()}, self.global_step)
         # Step 3: Compute custom loss (combination of LLaMA loss and MLP loss)
         # Assuming we have ground truth labels for both models' outputs
         # labels = inputs["labels"]
