@@ -192,14 +192,14 @@ if __name__ == '__main__':
     # llm.config.use_cache = False
 
     # do_train = True
-    wandb.log({"atten": llama_trainer.atten})
+    wandb.log({"test_acc": llama_trainer.atten})
     print("vanilla performance...")
     test_acc = llama_trainer.evaluate(test_dataset)
     wandb.log({"test_acc": test_acc})
     # Launch training and log metrics
     print("Training...")
     llama_trainer.train()
-    wandb.log({"atten": llama_trainer.atten})
+    wandb.log({"test_acc": llama_trainer.atten})
 
     print("Testing...")
     test_acc = llama_trainer.evaluate(test_dataset)

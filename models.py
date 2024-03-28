@@ -18,7 +18,7 @@ class CustomTrainer(Trainer):
         # self.model_a_optimizer = model_a_optimizer
 
         self.model_b_optimizer = torch.optim.Adam(self.model_b.parameters(), lr=mlp_lr)  # Example
-        self.atten = None
+        # self.atten = None
 
     def compute_loss(self, model, inputs, return_outputs=False):
         """
