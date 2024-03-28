@@ -44,8 +44,8 @@ class CustomTrainer(Trainer):
         # Step 2: Extract decoder hidden states and use them as input to model_b (MLP)
         # Assuming we take the last layer's hidden states
         inputs_b = pooled  # Detach to prevent gradients flowing into LLaMA during MLP's backward pass
-        kl_loss, _ = self.model_b(inputs_b)
-
+        kl_loss, atten = self.model_b(inputs_b)
+        self.log({"atten": atten.detach()})
         # Step 3: Compute custom loss (combination of LLaMA loss and MLP loss)
         # Assuming we have ground truth labels for both models' outputs
         # labels = inputs["labels"]
@@ -171,7 +171,7 @@ class MLP(nn.Module):
         rec_loss_fct = MSELoss(reduction='none')
         # rec_loss = rec_loss_fct(rec_hidden, tgt).sum(dim=-1).mean()
         rec_loss = rec_loss_fct(rec_hidden, tgt).mean()
-        print(attn.detach())
+        # print(attn.detach())
 
         # print(rec_hidden.size())
         # print()
