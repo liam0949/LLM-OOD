@@ -171,7 +171,7 @@ class MLP(nn.Module):
         rec_loss_fct = MSELoss(reduction='none')
         # rec_loss = rec_loss_fct(rec_hidden, tgt).sum(dim=-1).mean()
         rec_loss = rec_loss_fct(rec_hidden, tgt).mean()
-        print(attn.item())
+        print(attn.detach())
 
         # print(rec_hidden.size())
         # print()
