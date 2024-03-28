@@ -58,7 +58,7 @@ class CustomTrainer(Trainer):
         # kl_loss = kl_div(log_softmax(predictions, dim=1), target_distrib, reduction='batchmean')
 
         # Combine losses (example: simple addition, you can weight these as needed)
-        combined_loss = llama_loss + kl_loss  # + kl_loss
+        combined_loss = llama_loss + 0.1*kl_loss  # + kl_loss
 
         return (combined_loss, outputs_a) if return_outputs else combined_loss
 
