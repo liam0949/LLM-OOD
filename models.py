@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 
 class CustomTrainer(Trainer):
-    def __init__(self, model_a, model_b, args, mlp_lr, train_dataset, eval_dataset,wandb, **kwargs):
+    def __init__(self, model_a, model_b, args, mlp_lr, train_dataset, eval_dataset, **kwargs):
         # model_a is the LLaMA model
         # model_b is the MLP model
         super().__init__(model=model_a, args=args, train_dataset=train_dataset, eval_dataset=eval_dataset,
