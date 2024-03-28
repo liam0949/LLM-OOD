@@ -160,7 +160,8 @@ class MLP(nn.Module):
         mu, log_var = self.estimate(last_hidden, self.vae_emb2mu, self.vae_emb2logvar)
         kl_loss = self.kl_div(mu, log_var)
         z = self.reparameterize(mu, log_var)  ##sample_num, basz, hidden_dim
-        rec_hidden = self.layers(z)
+        # rec_hidden = self.layers(z)
+        rec_hidden = z
 
         # prefix = np.flip(np.logspace(0, layer_num, layer_num, endpoint=True, base=0.9))
 
@@ -170,6 +171,7 @@ class MLP(nn.Module):
         rec_loss_fct = MSELoss(reduction='none')
         # rec_loss = rec_loss_fct(rec_hidden, tgt).sum(dim=-1).mean()
         rec_loss = rec_loss_fct(rec_hidden, tgt).mean()
+        print(attn.item())
 
         # print(rec_hidden.size())
         # print()

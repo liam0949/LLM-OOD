@@ -52,6 +52,11 @@ ood_datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30
 import numpy as np
 # a = np.logspace(0, 32, 32, endpoint=True, base=0.9)
 # print(a)
-a = ({"name":"jack"},{"name":"jack2"},{"name":"jack"})
-b = tuple(d["name"] for d in a)
-print(b)
+import  torch
+from torch.nn import CrossEntropyLoss, MSELoss
+rec_loss_fct = MSELoss()
+        # rec_loss = rec_loss_fct(rec_hidden, tgt).sum(dim=-1).mean()
+a = torch.randn([128,5])
+b = torch.randn([128,5])
+rec_loss = rec_loss_fct(a, b)
+print(rec_loss)
