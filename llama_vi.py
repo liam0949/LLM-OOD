@@ -196,7 +196,7 @@ if __name__ == '__main__':
     print("vanilla performance...")
     test_acc = llama_trainer.evaluate(test_dataset)
     wandb.log({"test_acc": test_acc})
-    wandb.log({"atten": llama_trainer.atten.detach()}.numpy())
+    wandb.log({"atten": llama_trainer.atten.detach().numpy()})
 
     # Launch training and log metrics
     print("Training...")
