@@ -45,7 +45,7 @@ class CustomTrainer(Trainer):
         # Assuming we take the last layer's hidden states
         inputs_b = pooled  # Detach to prevent gradients flowing into LLaMA during MLP's backward pass
         kl_loss, atten = self.model_b(inputs_b)
-        self.log({"atten": atten.detach()})
+        self.wandb({"atten": atten.detach()}, self.global_step)
         # Step 3: Compute custom loss (combination of LLaMA loss and MLP loss)
         # Assuming we have ground truth labels for both models' outputs
         # labels = inputs["labels"]
