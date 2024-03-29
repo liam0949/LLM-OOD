@@ -124,7 +124,7 @@ class MLP(nn.Module):
     def __init__(self, input_size):
         super(MLP, self).__init__()
         layers = []
-        hidden_sizes = [input_size * 2, input_size * 4, input_size * 2]
+        hidden_sizes = [input_size//2, input_size //2]
         all_sizes = [input_size] + hidden_sizes + [input_size]
         for i in range(len(all_sizes) - 1):
             layers.append(nn.Linear(all_sizes[i], all_sizes[i + 1]))
@@ -162,8 +162,8 @@ class MLP(nn.Module):
         mu, log_var = self.estimate(last_hidden, self.vae_emb2mu, self.vae_emb2logvar)
         kl_loss = self.kl_div(mu, log_var)
         z = self.reparameterize(mu, log_var)  ##sample_num, basz, hidden_dim
-        # rec_hidden = self.layers(z)
-        rec_hidden = z
+        rec_hidden = self.layers(z)
+        # rec_hidden = z
 
         # prefix = np.flip(np.logspace(0, layer_num, layer_num, endpoint=True, base=0.9))
 
