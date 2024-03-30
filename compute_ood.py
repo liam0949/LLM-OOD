@@ -43,7 +43,7 @@ def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
     # print("in_scores",len(in_scores))
 
     for tag, ood_features in benchmarks:
-        dataloader = DataLoader(ood_features, batch_size=4, collate_fn=data_collator)
+        dataloader = DataLoader(ood_features, batch_size=32, collate_fn=data_collator)
         out_scores = compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes)
         print(tag,"out score finshed")
         results = evaluate_ood(in_scores, out_scores)
@@ -84,6 +84,7 @@ def save_results(args, test_results):
 
     print('test_results')
     print(data_diagram)
+
 
 
 def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classes):
@@ -254,39 +255,40 @@ if __name__ == '__main__':
     # outputs.last_hidden_states
     # exactly
     ##test acc
-    test_dataloader = DataLoader(test_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
-    # print("",len(test_dataloader))
-    eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
-    metric = evaluate.load("accuracy")
-
-    model.eval()
-    for batch in test_dataloader:
-        batch = {k: v.cuda() for k, v in batch.items()}
-        # print(batch["input_ids"][0])
-        with torch.no_grad():
-            outputs = model(**batch)
-        logits = outputs.logits
-        # # hs = outputs.hidden_states  # 33 128, 66, 4096
-        predictions = torch.argmax(logits, dim=-1)
-        metric.add_batch(predictions=predictions, references=batch["labels"])
-    # print("test acc:", metric.compute())
-
-    test_acc = metric.compute()
-
-    metric = evaluate.load("accuracy")
-    for batch in eval_dataloader:
-        batch = {k: v.cuda() for k, v in batch.items()}
-        # print(batch["input_ids"][0])
-        with torch.no_grad():
-            outputs = model(**batch)
-        logits = outputs.logits
-        # # hs = outputs.hidden_states  # 33 128, 66, 4096
-        predictions = torch.argmax(logits, dim=-1)
-        metric.add_batch(predictions=predictions, references=batch["labels"])
-    eval_acc = metric.compute()
-    del test_dataset, test_dataloader, dev_dataset, eval_dataloader
+    # test_dataloader = DataLoader(test_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
+    # # print("",len(test_dataloader))
+    # eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
+    # metric = evaluate.load("accuracy")
+    #
+    # model.eval()
+    # for batch in test_dataloader:
+    #     batch = {k: v.cuda() for k, v in batch.items()}
+    #     # print(batch["input_ids"][0])
+    #     with torch.no_grad():
+    #         outputs = model(**batch)
+    #     logits = outputs.logits
+    #     # # hs = outputs.hidden_states  # 33 128, 66, 4096
+    #     predictions = torch.argmax(logits, dim=-1)
+    #     metric.add_batch(predictions=predictions, references=batch["labels"])
+    # # print("test acc:", metric.compute())
+    #
+    # test_acc = metric.compute()
+    #
+    # metric = evaluate.load("accuracy")
+    # for batch in eval_dataloader:
+    #     batch = {k: v.cuda() for k, v in batch.items()}
+    #     # print(batch["input_ids"][0])
+    #     with torch.no_grad():
+    #         outputs = model(**batch)
+    #     logits = outputs.logits
+    #     # # hs = outputs.hidden_states  # 33 128, 66, 4096
+    #     predictions = torch.argmax(logits, dim=-1)
+    #     metric.add_batch(predictions=predictions, references=batch["labels"])
+    # eval_acc = metric.compute()
+    # del test_dataset, test_dataloader, dev_dataset, eval_dataloader
     ood_res = detect_ood(model, eval_dataloader, test_dataloader, benchmarks, data_collator)
-    final_res = dict({"test_acc": test_acc, 'eval_acc': eval_acc}, **ood_res)
+    # final_res = dict({"test_acc": test_acc, 'eval_acc': eval_acc}, **ood_res)
+    final_res = ood_res
 
     save_results(args, final_res)
     # print(res)
