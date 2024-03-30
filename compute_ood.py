@@ -18,6 +18,8 @@ import evaluate
 # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
+
+
 def merge_keys(l, keys):
     new_dict = {}
     for key in keys:
@@ -234,14 +236,14 @@ if __name__ == '__main__':
 
     benchmarks = ()
 
-    # if args.task_name in ["sst2", "imdb"]:
-    #     ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
-    # else:
-    #     ood_datasets = list(set(ood_datasets) - set([args.task_name]))
-    # for dataset in ood_datasets:
-    #     _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
-    #     benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
-    #     ood_dataset.to_pandas().info()
+    if args.task_name in ["sst2", "imdb"]:
+        ood_datasets = list(set(ood_datasets) - set(["sst2", "imdb"]))
+    else:
+        ood_datasets = list(set(ood_datasets) - set([args.task_name]))
+    for dataset in ood_datasets:
+        _, _, ood_dataset = load(dataset, tokenizer, max_seq_length=args.max_seq_length)
+        benchmarks = (('ood_' + dataset, ood_dataset),) + benchmarks
+        ood_dataset.to_pandas().info()
 
     # train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=8)
     # outputs.hidden_states[-1]
@@ -252,20 +254,37 @@ if __name__ == '__main__':
     ##test acc
     test_dataloader = DataLoader(test_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     # print("",len(test_dataloader))
-    # eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
+    eval_dataloader = DataLoader(dev_dataset, batch_size=args.val_batch_size, collate_fn=data_collator)
     metric = evaluate.load("accuracy")
 
     model.eval()
     for batch in test_dataloader:
         batch = {k: v.cuda() for k, v in batch.items()}
-        print(batch["input_ids"][0])
-        # with torch.no_grad():
-        #     outputs = model(**batch)
-        # logits = outputs.logits
+        # print(batch["input_ids"][0])
+        with torch.no_grad():
+            outputs = model(**batch)
+        logits = outputs.logits
         # # hs = outputs.hidden_states  # 33 128, 66, 4096
-        # predictions = torch.argmax(logits, dim=-1)
-        # metric.add_batch(predictions=predictions, references=batch["labels"])
+        predictions = torch.argmax(logits, dim=-1)
+        metric.add_batch(predictions=predictions, references=batch["labels"])
     # print("test acc:", metric.compute())
-    # res = detect_ood(model, eval_dataloader, test_dataloader, benchmarks, data_collator)
+
+    test_acc = metric.compute()
+
+    metric = evaluate.load("accuracy")
+    for batch in eval_dataloader:
+        batch = {k: v.cuda() for k, v in batch.items()}
+        # print(batch["input_ids"][0])
+        with torch.no_grad():
+            outputs = model(**batch)
+        logits = outputs.logits
+        # # hs = outputs.hidden_states  # 33 128, 66, 4096
+        predictions = torch.argmax(logits, dim=-1)
+        metric.add_batch(predictions=predictions, references=batch["labels"])
+    eval_acc = metric.compute()
+    ood_res = detect_ood(model, eval_dataloader, test_dataloader, benchmarks, data_collator)
+    final_res = dict({"test_acc": test_acc, 'eval_acc': eval_acc}, **ood_res)
+
+    save_results(args, final_res)
     # print(res)
     ## comput OOD
