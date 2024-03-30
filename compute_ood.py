@@ -49,6 +49,7 @@ def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
         results = evaluate_ood(in_scores, out_scores)
         # print("ood result", results)
         res.append(results)
+        del dataloader
 
         # wandb.log(results, step=num_steps)
     res = merge_keys(res, keys)
