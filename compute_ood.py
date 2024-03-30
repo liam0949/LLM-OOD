@@ -289,7 +289,7 @@ if __name__ == '__main__':
     eval_acc = metric.compute()
     # del test_dataset, test_dataloader, dev_dataset, eval_dataloader
     ood_res = detect_ood(model, eval_dataloader, test_dataloader, benchmarks, data_collator)
-    final_res = dict({"test_acc": test_acc, 'eval_acc': eval_acc}, **ood_res)
+    final_res = dict({"test_acc": test_acc['accuracy'], 'eval_acc': eval_acc["accuracy"]}, **ood_res)
     # final_res = ood_res
 
     save_results(args, final_res)
