@@ -124,8 +124,8 @@ class MLP(nn.Module):
     def __init__(self, input_size):
         super(MLP, self).__init__()
         layers = []
-        hidden_sizes = [input_size//2, input_size //2]
-        all_sizes = [input_size, input_size] + hidden_sizes + [input_size, input_size]
+        hidden_sizes = [input_size//2, input_size //2, input_size //2]
+        all_sizes = [input_size] + hidden_sizes + [input_size]
         for i in range(len(all_sizes) - 1):
             layers.append(nn.Linear(all_sizes[i], all_sizes[i + 1]))
             if i < len(hidden_sizes):  # Don't add activation after the last layer
