@@ -284,6 +284,7 @@ if __name__ == '__main__':
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=batch["labels"])
     eval_acc = metric.compute()
+    del test_dataset, test_dataloader, dev_dataset, eval_dataloader
     ood_res = detect_ood(model, eval_dataloader, test_dataloader, benchmarks, data_collator)
     final_res = dict({"test_acc": test_acc, 'eval_acc': eval_acc}, **ood_res)
 
