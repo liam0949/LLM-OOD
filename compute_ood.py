@@ -43,7 +43,7 @@ def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
     # print("in_scores",len(in_scores))
 
     for tag, ood_features in benchmarks:
-        dataloader = DataLoader(ood_features, batch_size=4, collate_fn=data_collator)
+        dataloader = DataLoader(ood_features, batch_size=32, collate_fn=data_collator)
         out_scores = compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes)
         print(tag,"out score finshed")
         results = evaluate_ood(in_scores, out_scores)
@@ -286,7 +286,7 @@ if __name__ == '__main__':
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=batch["labels"])
     eval_acc = metric.compute()
-    del test_dataset, test_dataloader, dev_dataset, eval_dataloader
+    # del test_dataset, test_dataloader, dev_dataset, eval_dataloader
     ood_res = detect_ood(model, eval_dataloader, test_dataloader, benchmarks, data_collator)
     final_res = dict({"test_acc": test_acc, 'eval_acc': eval_acc}, **ood_res)
     # final_res = ood_res
