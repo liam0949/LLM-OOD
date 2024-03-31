@@ -19,7 +19,16 @@ import evaluate
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
 
-
+task_to_labels = {
+    'sst2': 2,
+    'imdb': 2,
+    '20ng': 20,
+    'trec': 6,
+    'clinc150': 150,
+    "bank": round(77 * 0.5),
+    'rostd': 3
+    # "clincMix": 150
+}
 def merge_keys(l, keys):
     new_dict = {}
     for key in keys:
@@ -215,9 +224,9 @@ if __name__ == '__main__':
     out_dir = find_subdir_with_smallest_number(out_dir)
     print(out_dir)
     assert out_dir is not None
-
-    model = AutoPeftModelForSequenceClassification.from_pretrained(out_dir)
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
+    num_labels = task_to_labels[args.task_name]
+    model = AutoPeftModelForSequenceClassification.from_pretrained(out_dir, num_labels=num_labels)
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path, )
 
     tokenizer.pad_token_id = tokenizer.eos_token_id
     tokenizer.pad_token = tokenizer.eos_token
