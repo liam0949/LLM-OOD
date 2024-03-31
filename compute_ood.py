@@ -34,10 +34,13 @@ def merge_keys(l, keys):
 # outputs["fpr95_IN"] = fpr_95_in
 # outputs["aupr_IN"] = aupr_in
 def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
-    class_var, class_mean, norm_bank, all_classes = prepare_ood(model,dev_dataloader)
+    class_var, class_mean, norm_bank, all_classes = prepare_ood(model, dev_dataloader)
     print("finshed prepare")
     res = []
-    keys = ["auroc_IN", "fpr95_IN", "aupr_IN"]
+    keys = ["softmax_auroc_IN", "softmax_fpr95_IN", "softmax_aupr_IN",
+            "maha_auroc_IN", "maha_fpr95_IN", "maha_aupr_IN",
+            "cosine_auroc_IN", "cosine_fpr95_IN", "cosine_aupr_IN",
+            "energy_auroc_IN", "energy_fpr95_IN","energy_aupr_IN"]
 
     in_scores = compute_ood(test_dataset, model, class_var, class_mean, norm_bank, all_classes)
     # print("in_scores",len(in_scores))
@@ -45,7 +48,7 @@ def detect_ood(model, dev_dataloader, test_dataset, benchmarks, data_collator):
     for tag, ood_features in benchmarks:
         dataloader = DataLoader(ood_features, batch_size=32, collate_fn=data_collator)
         out_scores = compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes)
-        print(tag,"out score finshed")
+        print(tag, "out score finshed")
         results = evaluate_ood(in_scores, out_scores)
         # print("ood result", results)
         res.append(results)
@@ -79,7 +82,7 @@ def save_results(args, test_results):
         df1 = pd.read_csv(results_path)
         new = pd.DataFrame(results, index=[1])
         # df1 = df1.append(new, ignore_index=True)
-        df1= pd.concat([df1, new], ignore_index=True)
+        df1 = pd.concat([df1, new], ignore_index=True)
         df1.to_csv(results_path, index=False)
     data_diagram = pd.read_csv(results_path)
 
@@ -87,8 +90,7 @@ def save_results(args, test_results):
     print(data_diagram)
 
 
-
-def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classes):
+def compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes):
     model.eval()
     in_scores = []
     # dataloader = DataLoader(dev_dataset, batch_size=128, collate_fn=data_collator)
@@ -111,8 +113,7 @@ def compute_ood( dataloader, model, class_var, class_mean, norm_bank, all_classe
                 sequence_lengths = -1
 
             # pooled = pooled[torch.arange(args.val_batch_size), sequence_lengths]
-            pooled = pooled[torch.arange(batch_size,device=pooled.device), sequence_lengths]
-
+            pooled = pooled[torch.arange(batch_size, device=pooled.device), sequence_lengths]
 
         ood_keys = None
         softmax_score = F.softmax(logits, dim=-1).max(-1)[0]
@@ -228,7 +229,6 @@ if __name__ == '__main__':
     # print(model.config.output_hidden_states)
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-
 
     print(tokenizer.padding_side)
 
