@@ -25,7 +25,7 @@ def parse_args(script):
     parser.add_argument("--adam_epsilon", default=1e-8, type=float)
     parser.add_argument("--warmup_ratio", default=0.06, type=float)
     parser.add_argument("--weight_decay", default=0.001, type=float)
-    parser.add_argument("--num_train_epochs", default=30, type=float)
+    parser.add_argument("--num_train_epochs", default=20, type=float)
     parser.add_argument("--seed", type=int, default=88)
     parser.add_argument("--project_name", type=str, default="coling2024_ood")
     parser.add_argument("--shot", type=int, default=100)
@@ -39,11 +39,7 @@ def parse_args(script):
     parser.add_argument("--deterministic", action="store_true", help="If specified, learns the reduced dimensions\
                             through mlp in a deterministic manner.")
 
-    parser.add_argument("--beta", type=float, default=1e-3, help="Defines the weight for the information bottleneck\
-                            loss.")
-    parser.add_argument("--sample_size", type=int, default=20, help="Defines the number of samples for the ib method.")
 
-    # args = parser.parse_args()
 
 
     if script == 'train':
