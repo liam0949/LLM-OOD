@@ -220,7 +220,7 @@ def prepare_ood(model, dataloader=None):
 
 if __name__ == '__main__':
     args = parse_args("test")
-    args.ib = True
+    args.ib = False
     out_dir = os.path.join(args.save_results_path, args.task_name, str(args.seed), str(args.ib))
     print(out_dir)
     out_dir = find_subdir_with_smallest_number(out_dir)
