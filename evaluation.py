@@ -72,9 +72,9 @@ def evaluate_ood(in_scores,out_scores):
         # outputs[tag + "_" + key + "_auroc_IN"] = auroc_in
         # outputs[tag + "_" + key + "_fpr95_IN"] = fpr_95_in
         # outputs[tag + "_" + key + "_aupr_IN"] = aupr_in
-        outputs["auroc_IN"] = auroc_in
-        outputs["fpr95_IN"] = fpr_95_in
-        outputs["aupr_IN"] = aupr_in
+        outputs[key+"auroc_IN"] = auroc_in
+        outputs[key+"fpr95_IN"] = fpr_95_in
+        outputs[key+"aupr_IN"] = aupr_in
         # ood_multi30k_softmax_fpr95_IN
 
         # outputs[tag + "_" + key + "_auroc_OUT"] = auroc_out
