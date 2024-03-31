@@ -104,6 +104,7 @@ def compute_ood(dataloader, model, class_var, class_mean, norm_bank, all_classes
     in_scores = []
     # dataloader = DataLoader(dev_dataset, batch_size=128, collate_fn=data_collator)
     for batch in dataloader:
+        batch.pop("idx", None)
         batch = {key: value.cuda() for key, value in batch.items()}
         input_ids = batch['input_ids']
         batch['labels'] = None
@@ -173,6 +174,7 @@ def prepare_ood(model, dataloader=None):
     label_bank = None
     model.eval()
     for batch in dataloader:
+        batch.pop("idx", None)
         batch = {key: value.cuda() for key, value in batch.items()}
         labels = batch['labels']
         input_ids = batch['input_ids']
