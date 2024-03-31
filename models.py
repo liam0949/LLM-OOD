@@ -48,7 +48,7 @@ class CustomTrainer(Trainer):
 
         # Combine losses (example: simple addition, you can weight these as needed)
         # combined_loss = llama_loss + 0.01 * kl_loss  # + kl_loss
-        combined_loss = llama_loss + 0.001 * kl_loss  # + kl_loss
+        combined_loss = llama_loss + 0.0005 * kl_loss  # + kl_loss
 
         return (combined_loss, outputs_a) if return_outputs else combined_loss
 
