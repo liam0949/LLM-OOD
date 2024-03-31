@@ -275,6 +275,7 @@ if __name__ == '__main__':
 
     model.eval()
     for batch in test_dataloader:
+        batch.pop("idx", None)
         batch = {k: v.cuda() for k, v in batch.items()}
         # print(batch["input_ids"][0])
         with torch.no_grad():
@@ -289,6 +290,7 @@ if __name__ == '__main__':
 
     metric = evaluate.load("accuracy")
     for batch in eval_dataloader:
+        batch.pop("idx", None)
         batch = {k: v.cuda() for k, v in batch.items()}
         # print(batch["input_ids"][0])
         with torch.no_grad():
