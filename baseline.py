@@ -150,12 +150,7 @@ if __name__ == '__main__':
     model.print_trainable_parameters()
     model = model.cuda()
 
-    # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
-    # datasets = ['sst2', 'imdb', 'trec', '20ng']
-    # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k', 'clinc150']
-    # datasets = ['clinc150', 'bank', 'rostd']
 
-    benchmarks = ()
     train_dataset, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
                                                     is_id=True)
     print("train size " + args.task_name, len(train_dataset))
@@ -213,6 +208,7 @@ if __name__ == '__main__':
     print("Testing...")
     test_acc = llama_trainer.evaluate(test_dataset)
     wandb.log({"test_acc": test_acc})
+
     # if do_train:
     #     train_result = trainer.train()
     #     metrics = train_result.metrics

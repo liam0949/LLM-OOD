@@ -24,7 +24,7 @@ class CustomTrainer(Trainer):
         """
         Custom loss computation.
         """
-        # Step 1: Forward pass through model_a (LLaMA)
+
         outputs_a = self.model_a(**inputs)
         llama_loss = outputs_a.loss
 
@@ -47,8 +47,7 @@ class CustomTrainer(Trainer):
         self.atten = atten
 
         # Combine losses (example: simple addition, you can weight these as needed)
-        # combined_loss = llama_loss + 0.01 * kl_loss  # + kl_loss
-        combined_loss = llama_loss + 0.0005 * kl_loss  # + kl_loss
+        combined_loss = llama_loss + 0.01 * kl_loss  # + kl_loss
 
         return (combined_loss, outputs_a) if return_outputs else combined_loss
 
@@ -113,7 +112,7 @@ class MLP(nn.Module):
         kl_loss = self.kl_div(mu, log_var)
         z = self.reparameterize(mu, log_var)  ##sample_num, basz, hidden_dim
         rec_hidden = self.layers(z)
-        # prefix = np.flip(np.logspace(0, layer_num, layer_num, endpoint=True, base=0.9))
+
 
         attn = F.softmax(self.vae_hidden_attention).view(layer_num, 1, 1)
         tgt = layer_last * attn

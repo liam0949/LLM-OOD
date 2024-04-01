@@ -14,43 +14,15 @@ def merge_keys(l, keys):
     return new_dict
 
 
-
-
-
-def evaluate_ood(in_scores,out_scores):
-
+def evaluate_ood(in_scores, out_scores):
     keys = ['softmax', 'maha', 'cosine', 'energy']
 
-
-    # dataloader = DataLoader(features, batch_size=args.val_batch_size, collate_fn=collate_fn)
-    # in_scores = []
-    # for batch in dataloader:
-    #     model.eval()
-    #     batch = {key: value.to(args.device) for key, value in batch.items()}
-    #     with torch.no_grad():
-    #         ood_keys = model.compute_ood(**batch)
-    #         in_scores.append(ood_keys)
     in_scores = merge_keys(in_scores, keys)
 
-    # dataloader = DataLoader(ood, batch_size=args.val_batch_size, collate_fn=collate_fn)
-    # out_scores = []
-    # for batch in dataloader:
-    #     model.eval()
-    #     batch = {key: value.to(args.device) for key, value in batch.items()}
-    #     with torch.no_grad():
-    #         ood_keys = model.compute_ood(**batch)
-    #         out_scores.append(ood_keys)
     out_scores = merge_keys(out_scores, keys)
 
     outputs = {}
     for key in keys:
-        # ins = np.array(in_scores[key], dtype=np.float64)
-        # outs = np.array(out_scores[key], dtype=np.float64)
-        # inl = np.ones_like(ins).astype(np.int64)
-        # outl = np.zeros_like(outs).astype(np.int64)
-        # scores = np.concatenate([ins, outs], axis=0)
-        # labels_in = np.concatenate([inl, outl], axis=0)
-        # labels_out = np.concatenate([np.zeros_like(ins).astype(np.int64), np.ones_like(outs).astype(np.int64)], axis=0)
 
         if key == "mix":
             auroc_in, aupr_in, fpr_95_in = get_measures(
@@ -72,14 +44,9 @@ def evaluate_ood(in_scores,out_scores):
         # outputs[tag + "_" + key + "_auroc_IN"] = auroc_in
         # outputs[tag + "_" + key + "_fpr95_IN"] = fpr_95_in
         # outputs[tag + "_" + key + "_aupr_IN"] = aupr_in
-        outputs[key+"_auroc_IN"] = auroc_in
-        outputs[key+"_fpr95_IN"] = fpr_95_in
-        outputs[key+"_aupr_IN"] = aupr_in
-        # ood_multi30k_softmax_fpr95_IN
-
-        # outputs[tag + "_" + key + "_auroc_OUT"] = auroc_out
-        # outputs[tag + "_" + key + "_fpr95_OUT"] = fpr_95_out
-        # outputs[tag + "_" + key + "_aupr_OUT"] = aupr_out
+        outputs[key + "_auroc_IN"] = auroc_in
+        outputs[key + "_fpr95_IN"] = fpr_95_in
+        outputs[key + "_aupr_IN"] = aupr_in
 
     return outputs
 

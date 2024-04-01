@@ -137,11 +137,6 @@ if __name__ == '__main__':
     model = model.cuda()
     mlp = MLP(model.config.hidden_size).cuda()
 
-    # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k']
-    # datasets = ['sst2', 'imdb', 'trec', '20ng']
-    # datasets = ['rte', 'sst2', 'mnli', '20ng', 'trec', 'imdb', 'wmt16', 'multi30k', 'clinc150']
-    # datasets = ['clinc150', 'bank', 'rostd']
-
     benchmarks = ()
     train_dataset, dev_dataset, test_dataset = load(args.task_name, tokenizer, max_seq_length=args.max_seq_length,
                                                     is_id=True)
